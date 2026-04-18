@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:audio_session/audio_session.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter/foundation.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:wisdom_gre_app/core/providers/language_provider.dart';
@@ -12,6 +13,24 @@ import 'package:wisdom_gre_app/features/flashcards/domain/review_session_provide
 import 'package:wisdom_gre_app/features/podcast/data/models/podcast_state.dart';
 
 part 'podcast_controller.g.dart';
+
+@pragma('vm:entry-point')
+void startCallback() {
+  FlutterForegroundTask.setTaskHandler(ForegroundTaskHandler());
+}
+
+class ForegroundTaskHandler extends TaskHandler {
+  @override
+  Future<void> onStart(DateTime timestamp, TaskStarter starter) async {}
+  @override
+  void onRepeatEvent(DateTime timestamp) {}
+  @override
+  Future<void> onDestroy(DateTime timestamp, bool isTimeout) async {}
+  @override
+  void onNotificationButtonPressed(String id) {}
+  @override
+  void onNotificationPressed() => FlutterForegroundTask.launchApp();
+}
 
 @Riverpod(keepAlive: true)
 class PodcastController extends _$PodcastController {
@@ -28,6 +47,7 @@ class PodcastController extends _$PodcastController {
       _tts.stop();
       _audioPlayer.dispose();
       _keepAlivePlayer.dispose();
+      FlutterForegroundTask.stopService();
       WakelockPlus.disable();
     });
     return const PodcastState();
@@ -36,6 +56,26 @@ class PodcastController extends _$PodcastController {
   Future<void> _initAudio() async {
     final session = await AudioSession.instance;
     await session.configure(const AudioSessionConfiguration.speech());
+    
+    // Foreground Service Init
+    FlutterForegroundTask.init(
+      androidNotificationOptions: AndroidNotificationOptions(
+        channelId: 'podcast_channel',
+        channelName: 'Podcast Sync',
+        channelDescription: 'Keeps podcast active in background',
+        channelImportance: NotificationChannelImportance.LOW,
+        priority: NotificationPriority.LOW,
+      ),
+      iosNotificationOptions: const IOSNotificationOptions(
+        showNotification: true,
+        playSound: false,
+      ),
+      foregroundTaskOptions: ForegroundTaskOptions(
+        eventAction: ForegroundTaskEventAction.nothing(),
+        allowWakeLock: true,
+        allowWifiLock: true,
+      ),
+    );
     
     // Hardware Initialization (Expert Mode)
     await _tts.setSharedInstance(true);
@@ -100,6 +140,18 @@ class PodcastController extends _$PodcastController {
       _keepAlivePlayer.play();
     } catch (_) {}
     
+    try {
+      if (await FlutterForegroundTask.isRunningService == false) {
+        await FlutterForegroundTask.startService(
+          notificationTitle: 'GRE Podcast',
+          notificationText: 'Learning in progress...',
+          callback: startCallback,
+        );
+      }
+    } catch (e) {
+      debugPrint("ForegroundTask start error: $e");
+    }
+    
     _playbackLoop(_newSession());
   }
 
@@ -108,6 +160,7 @@ class PodcastController extends _$PodcastController {
     await _tts.stop(); 
     await _audioPlayer.stop();
     await _keepAlivePlayer.stop();
+    await FlutterForegroundTask.stopService();
     
     final session = await AudioSession.instance;
     await session.setActive(false);
@@ -300,6 +353,7 @@ class PodcastController extends _$PodcastController {
           final session = await AudioSession.instance;
           await session.setActive(false);
           await _keepAlivePlayer.stop();
+          await FlutterForegroundTask.stopService();
           break;
         }
       } catch (e) {

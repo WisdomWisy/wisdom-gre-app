@@ -1,0 +1,231 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:wisdom_gre_app/core/components/mesh_background.dart';
+import 'package:wisdom_gre_app/core/theme/app_theme.dart';
+import 'package:wisdom_gre_app/features/dashboard/domain/providers/exam_goal_provider.dart';
+import 'package:wisdom_gre_app/core/components/settings_dialog.dart';
+import 'package:wisdom_gre_app/features/vocabulary/domain/providers/vocabulary_provider.dart';
+import 'package:wisdom_gre_app/features/flashcards/presentation/screens/flashcard_screen.dart';
+import 'package:wisdom_gre_app/features/podcast/presentation/screens/podcast_screen.dart';
+
+class DashboardScreen extends ConsumerWidget {
+  const DashboardScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final vocabularyAsync = ref.watch(vocabularyProvider);
+    final themeData = ref.watch(themeControllerProvider);
+    final examDate = ref.watch(examDateProvider);
+
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: MeshBackground(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.settings, color: themeData.textColor, size: 28),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => const SettingsDialog(),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 40),
+              Text(
+                'Welcome Back',
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                  color: themeData.textColor,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              Text(
+                'Ready to conquer the GRE?',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: themeData.textColor.withValues(alpha: 0.8),
+                ),
+              ),
+              const Spacer(),
+              vocabularyAsync.when(
+                data: (words) {
+                  final dailyGoalValue = ref.watch(dailyGoalProvider(totalWords: words.length));
+                  
+                  return Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: themeData.surfaceColor,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Total Words',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: themeData.textColor.withValues(alpha: 0.7),
+                              ),
+                            ),
+                            Text(
+                              '${words.length}',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: themeData.textColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        Divider(color: themeData.textColor.withValues(alpha: 0.2)),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Exam Date',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: themeData.textColor.withValues(alpha: 0.7),
+                              ),
+                            ),
+                            TextButton.icon(
+                              onPressed: () async {
+                                final selected = await showDatePicker(
+                                  context: context,
+                                  initialDate: examDate ?? DateTime.now().add(const Duration(days: 30)),
+                                  firstDate: DateTime.now(),
+                                  lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
+                                );
+                                if (selected != null) {
+                                  ref.read(examDateProvider.notifier).setDate(selected);
+                                }
+                              },
+                              icon: Icon(Icons.calendar_today, color: themeData.textColor),
+                              label: Text(
+                                examDate != null ? DateFormat('MMM d, yyyy').format(examDate) : 'Set Date',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: themeData.textColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (examDate != null) ...[
+                          const SizedBox(height: 20),
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: themeData.textColor.withValues(alpha: 0.05),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.flag, color: themeData.textColor),
+                                const SizedBox(width: 12),
+                                Text(
+                                  'Your goal: $dailyGoalValue words / day',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: themeData.textColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: themeData.textColor,
+                              foregroundColor: themeData.surfaceColor,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(builder: (_) => const FlashcardScreen()),
+                              );
+                            },
+                            child: const Text(
+                              'Start Learning',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: themeData.textColor,
+                              side: BorderSide(color: themeData.textColor, width: 2),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(builder: (_) => const PodcastScreen()),
+                              );
+                            },
+                            icon: Icon(Icons.headphones_rounded, color: themeData.textColor),
+                            label: const Text(
+                              'Listen to Podcast',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  );
+                },
+                loading: () => Center(
+                  child: CircularProgressIndicator(color: themeData.textColor),
+                ),
+                error: (error, stack) => Center(
+                  child: Text(
+                    'Error loading vocabulary',
+                    style: TextStyle(color: themeData.textColor),
+                  ),
+                ),
+              ),
+              const Spacer(flex: 2),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
