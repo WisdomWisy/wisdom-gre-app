@@ -20,13 +20,15 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: MeshBackground(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+      body: SafeArea(
+        child: MeshBackground(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   IconButton(
@@ -57,21 +59,25 @@ class DashboardScreen extends ConsumerWidget {
                   color: themeData.textColor.withValues(alpha: 0.8),
                 ),
               ),
-              const Spacer(),
+              const SizedBox(height: 36),
               vocabularyAsync.when(
                 data: (words) {
                   final dailyGoalValue = ref.watch(dailyGoalProvider(totalWords: words.length));
                   
                   return Container(
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(28),
                     decoration: BoxDecoration(
-                      color: themeData.surfaceColor,
-                      borderRadius: BorderRadius.circular(24),
+                      color: themeData.surfaceColor.withValues(alpha: 0.85),
+                      borderRadius: BorderRadius.circular(32),
+                      border: Border.all(
+                        color: themeData.textColor.withValues(alpha: 0.1),
+                        width: 1.5,
+                      ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
+                          color: themeData.textColor.withValues(alpha: 0.08),
+                          blurRadius: 30,
+                          offset: const Offset(0, 15),
                         ),
                       ],
                     ),
@@ -138,10 +144,21 @@ class DashboardScreen extends ConsumerWidget {
                         if (examDate != null) ...[
                           const SizedBox(height: 20),
                           Container(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
                             decoration: BoxDecoration(
-                              color: themeData.textColor.withValues(alpha: 0.05),
-                              borderRadius: BorderRadius.circular(16),
+                              gradient: LinearGradient(
+                                colors: [
+                                  themeData.textColor.withValues(alpha: 0.08),
+                                  themeData.textColor.withValues(alpha: 0.02),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: themeData.textColor.withValues(alpha: 0.1),
+                                width: 1,
+                              ),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -164,9 +181,11 @@ class DashboardScreen extends ConsumerWidget {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: themeData.textColor,
                               foregroundColor: themeData.surfaceColor,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              elevation: 8,
+                              shadowColor: themeData.textColor.withValues(alpha: 0.3),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(20),
                               ),
                             ),
                             onPressed: () {
@@ -186,10 +205,11 @@ class DashboardScreen extends ConsumerWidget {
                           OutlinedButton.icon(
                             style: OutlinedButton.styleFrom(
                               foregroundColor: themeData.textColor,
-                              side: BorderSide(color: themeData.textColor, width: 2),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              side: BorderSide(color: themeData.textColor.withValues(alpha: 0.3), width: 2),
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              backgroundColor: themeData.surfaceColor.withValues(alpha: 0.5),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(20),
                               ),
                             ),
                             onPressed: () {
@@ -221,8 +241,9 @@ class DashboardScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              const Spacer(flex: 2),
-            ],
+              const SizedBox(height: 48),
+              ],
+            ),
           ),
         ),
       ),

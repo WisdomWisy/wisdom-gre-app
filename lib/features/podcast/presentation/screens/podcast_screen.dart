@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wisdom_gre_app/core/components/mesh_background.dart';
@@ -131,9 +132,9 @@ class _PodcastScreenState extends ConsumerState<PodcastScreen> {
           children: [
             const SizedBox(height: 20),
 
-            // ── Album art — implicit glow changes with isPlaying ──
+            // ── Album art — Spinning Vinyl + Tonearm ──
             _AlbumArt(
-              letter: word.word[0].toUpperCase(),
+              word: word.word,
               isPlaying: state.isPlaying,
               theme: theme,
             ),
@@ -183,92 +184,272 @@ class _PodcastScreenState extends ConsumerState<PodcastScreen> {
 // Album Art  — glow pulses via AnimatedContainer (implicit, no ticker)
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _AlbumArt extends StatelessWidget {
+class _AlbumArt extends StatefulWidget {
   const _AlbumArt({
-    required this.letter,
+    required this.word,
     required this.isPlaying,
     required this.theme,
   });
 
-  final String letter;
+  final String word;
   final bool isPlaying;
   final AppThemeData theme;
 
   @override
+  State<_AlbumArt> createState() => _AlbumArtState();
+}
+
+class _AlbumArtState extends State<_AlbumArt> with SingleTickerProviderStateMixin {
+  late final AnimationController _spinCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _spinCtrl = AnimationController(
+        vsync: this, duration: const Duration(seconds: 4));
+    if (widget.isPlaying) _spinCtrl.repeat();
+  }
+
+  @override
+  void didUpdateWidget(_AlbumArt oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isPlaying && !oldWidget.isPlaying) {
+      _spinCtrl.repeat();
+    } else if (!widget.isPlaying && oldWidget.isPlaying) {
+      _spinCtrl.stop();
+    }
+  }
+
+  @override
+  void dispose() {
+    _spinCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 600),
-      curve: Curves.easeInOut,
-      width: isPlaying ? 220 : 200,
-      height: isPlaying ? 220 : 200,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: RadialGradient(
-          colors: [
-            theme.textColor.withValues(alpha: 0.1),
-            theme.textColor.withValues(alpha: 0.65),
-            theme.textColor.withValues(alpha: 0.92),
-          ],
-          stops: const [0.0, 0.5, 1.0],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: theme.textColor
-                .withValues(alpha: isPlaying ? 0.4 : 0.15),
-            blurRadius: isPlaying ? 50 : 20,
-            spreadRadius: isPlaying ? 6 : 0,
-            offset: const Offset(0, 14),
-          ),
-        ],
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Groove rings
-          for (final r in [0.62, 0.76, 0.87])
-            SizedBox(
-              width: (isPlaying ? 220 : 200) * r,
-              height: (isPlaying ? 220 : 200) * r,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: theme.surfaceColor.withValues(alpha: 0.1),
-                    width: 1,
-                  ),
-                ),
-              ),
-            ),
-          // Centre label
-          Container(
-            width: 56,
-            height: 56,
+    return Stack(
+      alignment: Alignment.center,
+      clipBehavior: Clip.none,
+      children: [
+        // The Spinning Vinyl
+        AnimatedBuilder(
+          animation: _spinCtrl,
+          builder: (context, child) {
+            return Transform.rotate(
+              angle: _spinCtrl.value * 2 * math.pi,
+              child: child,
+            );
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 600),
+            curve: Curves.easeInOut,
+            width: widget.isPlaying ? 230 : 210,
+            height: widget.isPlaying ? 230 : 210,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: theme.surfaceColor.withValues(alpha: 0.9),
+              gradient: RadialGradient(
+                colors: [
+                  widget.theme.textColor.withValues(alpha: 0.1),
+                  widget.theme.textColor.withValues(alpha: 0.65),
+                  widget.theme.textColor.withValues(alpha: 0.92),
+                ],
+                stops: const [0.0, 0.5, 1.0],
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
-                  blurRadius: 6,
+                  color: widget.theme.textColor.withValues(alpha: widget.isPlaying ? 0.4 : 0.15),
+                  blurRadius: widget.isPlaying ? 50 : 20,
+                  spreadRadius: widget.isPlaying ? 6 : 0,
+                  offset: const Offset(0, 14),
                 ),
               ],
             ),
-            child: Center(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                child: Text(
-                  letter,
-                  key: ValueKey(letter),
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900,
-                    color: theme.textColor,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Groove rings
+                for (final r in [0.62, 0.76, 0.87])
+                  SizedBox(
+                    width: (widget.isPlaying ? 230 : 210) * r,
+                    height: (widget.isPlaying ? 230 : 210) * r,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: widget.theme.surfaceColor.withValues(alpha: 0.15),
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                // Centre label
+                Container(
+                  width: 90,
+                  height: 90,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: widget.theme.surfaceColor.withValues(alpha: 0.95),
+                    border: Border.all(color: widget.theme.textColor.withValues(alpha: 0.2)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        blurRadius: 10,
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Text(
+                        widget.word,
+                        key: ValueKey(widget.word),
+                        maxLines: 1,
+                        overflow: TextOverflow.clip,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                          color: widget.theme.textColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                // Spindle hole
+                Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: widget.theme.textColor,
+                    border: Border.all(color: widget.theme.surfaceColor, width: 2),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        // The Tonearm
+        Positioned(
+          top: -20,
+          right: -10,
+          child: _TonearmWidget(isPlaying: widget.isPlaying, theme: widget.theme),
+        ),
+      ],
+    );
+  }
+}
+
+class _TonearmWidget extends StatelessWidget {
+  final bool isPlaying;
+  final AppThemeData theme;
+
+  const _TonearmWidget({required this.isPlaying, required this.theme});
+
+  @override
+  Widget build(BuildContext context) {
+    // Rotation pivot is at alignment: Alignment.topRight roughly
+    return AnimatedRotation(
+      turns: isPlaying ? 0.08 : -0.06,
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeInOutCubic,
+      alignment: const Alignment(0.8, -0.8), // Custom anchor for pivot
+      child: IgnorePointer(
+        child: SizedBox(
+          width: 80,
+          height: 150,
+          child: Stack(
+            alignment: Alignment.topRight,
+            children: [
+              // Straight arm segment
+              Positioned(
+                top: 25,
+                right: 25,
+                child: Transform.rotate(
+                  angle: 0.3,
+                  child: Container(
+                    width: 8,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          theme.textColor.withValues(alpha: 0.4),
+                          theme.textColor,
+                          theme.textColor.withValues(alpha: 0.6),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(4),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.3),
+                          blurRadius: 4,
+                          offset: const Offset(2, 4),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
+              // Stylus Head
+              Positioned(
+                bottom: 15,
+                left: 15,
+                child: Transform.rotate(
+                  angle: 0.6,
+                  child: Container(
+                    width: 14,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: theme.textColor,
+                      borderRadius: BorderRadius.circular(3),
+                      border: Border.all(color: theme.surfaceColor, width: 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.4),
+                          blurRadius: 6,
+                          offset: const Offset(4, 4),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              // Base Pivot Mount
+              Positioned(
+                top: 0,
+                right: 0,
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: theme.surfaceColor,
+                    border: Border.all(color: theme.textColor, width: 3),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.4),
+                        blurRadius: 10,
+                        offset: const Offset(2, 4),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Container(
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: theme.textColor,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
