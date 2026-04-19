@@ -27,6 +27,12 @@ _GreWord _$GreWordFromJson(Map<String, dynamic> json) => _GreWord(
   mnemonics: WordMnemonics.fromJson(json['mnemonics'] as Map<String, dynamic>),
   etymology: WordEtymology.fromJson(json['etymology'] as Map<String, dynamic>),
   audioFile: json['audio_file'] as String,
+  practiceQuestions:
+      json['practice_questions'] == null
+          ? null
+          : PracticeQuestions.fromJson(
+            json['practice_questions'] as Map<String, dynamic>,
+          ),
 );
 
 Map<String, dynamic> _$GreWordToJson(_GreWord instance) => <String, dynamic>{
@@ -43,6 +49,7 @@ Map<String, dynamic> _$GreWordToJson(_GreWord instance) => <String, dynamic>{
   'mnemonics': instance.mnemonics,
   'etymology': instance.etymology,
   'audio_file': instance.audioFile,
+  'practice_questions': instance.practiceQuestions,
 };
 
 _WordTranslations _$WordTranslationsFromJson(Map<String, dynamic> json) =>

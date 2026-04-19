@@ -246,24 +246,20 @@ class PodcastController extends _$PodcastController {
     return !_isDead(id);
   }
 
-  /// Plays the ElevenLabs high-quality MP3 for the word pronunciation.
-  Future<bool> _playMp3(int id, String localPath, String fallbackWord) async {
+  Future<bool> _playMp3(int id, String localPath, String fallbackWord, double rate) async {
     if (_isDead(id)) return false;
     try {
-      // just_audio setAsset expects the exact path defined in pubspec or the structure.
-      // Assuming audio_file = "audio/abate.mp3" which matches the root `- audio/`
-      // We will parse it dynamically. If it somehow fails, we await a short gap.
       await _audioPlayer.setAsset(localPath.isNotEmpty ? localPath : 'audio/$fallbackWord.mp3');
       await _audioPlayer.play();
       await _audioPlayer.stop(); // Explicitly release hardware stream
       
       // Slight delay to yield Audio Focus cleanly to the Android TTS Engine
       await Future.delayed(const Duration(milliseconds: 500));
+      return !_isDead(id);
     } catch (_) {
-      // Ignore audio errors gracefully and fallback
-      await Future.delayed(const Duration(milliseconds: 500));
+      // Fallback to native TTS if MP3 asset loading fails
+      return await _safeSpeak(id, fallbackWord, 'en-US', rate);
     }
-    return !_isDead(id);
   }
 
   Future<bool> _gap(int id, Duration d) async {
@@ -289,7 +285,7 @@ class PodcastController extends _$PodcastController {
         state = state.copyWith(
             currentlySpeakingTitle: 'Word', currentlySpeakingText: word.word);
         if (word.audioFile.isNotEmpty) {
-          if (!await _playMp3(id, word.audioFile, word.word)) break;
+          if (!await _playMp3(id, word.audioFile, word.word, rate)) break;
         } else {
           if (!await _safeSpeak(id, word.word, 'en-US', rate)) break;
         }

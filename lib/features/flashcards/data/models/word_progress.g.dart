@@ -13,6 +13,10 @@ _WordProgress _$WordProgressFromJson(Map<String, dynamic> json) =>
       interval: (json['interval'] as num?)?.toInt() ?? 0,
       repetitions: (json['repetitions'] as num?)?.toInt() ?? 0,
       nextReviewDate: DateTime.parse(json['nextReviewDate'] as String),
+      lastReviewDate:
+          json['lastReviewDate'] == null
+              ? null
+              : DateTime.parse(json['lastReviewDate'] as String),
     );
 
 Map<String, dynamic> _$WordProgressToJson(_WordProgress instance) =>
@@ -22,4 +26,5 @@ Map<String, dynamic> _$WordProgressToJson(_WordProgress instance) =>
       'interval': instance.interval,
       'repetitions': instance.repetitions,
       'nextReviewDate': instance.nextReviewDate.toIso8601String(),
+      'lastReviewDate': instance.lastReviewDate?.toIso8601String(),
     };

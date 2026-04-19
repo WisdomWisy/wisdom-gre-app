@@ -6,16 +6,9 @@ part of 'podcast_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$podcastControllerHash() => r'9c1f736c5f79fe1038da9ef9a898279aae61a911';
+String _$podcastControllerHash() => r'183081ad95d0cd96fcba9c66598d1093c9162ae0';
 
-/// Podcast Mode Controller — TTS-only, using manual completion detection.
-///
-/// We do NOT use awaitSpeakCompletion(true) because its internal Completer
-/// becomes corrupted after tts.stop() calls on Android, causing indefinite hangs.
-/// Instead, we use setCompletionHandler + setErrorHandler + our own Completer
-/// to reliably detect when each utterance finishes.
-///
-/// Copied from [PodcastController].
+/// See also [PodcastController].
 @ProviderFor(PodcastController)
 final podcastControllerProvider =
     NotifierProvider<PodcastController, PodcastState>.internal(

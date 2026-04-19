@@ -8,6 +8,7 @@ import 'package:wisdom_gre_app/core/components/settings_dialog.dart';
 import 'package:wisdom_gre_app/features/vocabulary/domain/providers/vocabulary_provider.dart';
 import 'package:wisdom_gre_app/features/flashcards/presentation/screens/flashcard_screen.dart';
 import 'package:wisdom_gre_app/features/podcast/presentation/screens/podcast_screen.dart';
+import 'package:wisdom_gre_app/features/arena/presentation/screens/arena_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -220,6 +221,31 @@ class DashboardScreen extends ConsumerWidget {
                             icon: Icon(Icons.headphones_rounded, color: themeData.textColor),
                             label: const Text(
                               'Listen to Podcast',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.amber[400],
+                              side: BorderSide(color: Colors.amber[400]!.withValues(alpha: 0.5), width: 2),
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              backgroundColor: Colors.amber[800]!.withValues(alpha: 0.1),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(builder: (_) => const ArenaScreen()),
+                              );
+                            },
+                            icon: const Icon(Icons.sports_esports),
+                            label: const Text(
+                              'Enter The Arena',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,

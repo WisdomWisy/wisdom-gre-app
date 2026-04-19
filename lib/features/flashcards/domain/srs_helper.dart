@@ -51,6 +51,7 @@ class SRSHelper {
       easinessFactor: easiness,
       interval: interval,
       nextReviewDate: nextReviewDate,
+      lastReviewDate: now,
     );
   }
 }

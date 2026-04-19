@@ -7,9 +7,13 @@ part of 'tts_settings_provider.dart';
 // **************************************************************************
 
 String _$ttsSpeechRateControllerHash() =>
-    r'88af31326b538e97374eb8df1c41aad8e8e727fc';
+    r'230c32c8d5302688b548b37f840c8048986133a5';
 
-/// See also [TtsSpeechRateController].
+/// Persists the user's preferred TTS speech rate across sessions.
+/// Range: 0.1 (very slow) – 1.0 (native speed).
+/// Default: 0.5 (comfortable for language learning).
+///
+/// Copied from [TtsSpeechRateController].
 @ProviderFor(TtsSpeechRateController)
 final ttsSpeechRateControllerProvider =
     NotifierProvider<TtsSpeechRateController, double>.internal(

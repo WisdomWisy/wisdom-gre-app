@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'practice_questions.dart';
 
 part 'gre_word.freezed.dart';
 part 'gre_word.g.dart';
@@ -19,6 +20,7 @@ abstract class GreWord with _$GreWord {
     required WordMnemonics mnemonics,
     required WordEtymology etymology,
     @JsonKey(name: 'audio_file') required String audioFile,
+    @JsonKey(name: 'practice_questions') PracticeQuestions? practiceQuestions,
   }) = _GreWord;
 
   factory GreWord.fromJson(Map<String, dynamic> json) => _$GreWordFromJson(json);

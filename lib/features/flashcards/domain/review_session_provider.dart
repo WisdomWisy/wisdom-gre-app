@@ -35,6 +35,13 @@ class WordProgressRepository extends _$WordProgressRepository {
     // Refresh the session so the reviewed word leaves the queue
     ref.invalidate(reviewSessionProvider);
   }
+
+  Future<void> resetAllProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_progressKey);
+    state = const AsyncData({});
+    ref.invalidate(reviewSessionProvider);
+  }
 }
 
 /// Represents the session queue for the day
@@ -43,12 +50,24 @@ Future<List<GreWord>> reviewSession(ReviewSessionRef ref) async {
   final allWordsQuery = await ref.watch(vocabularyProvider.future);
   final progressQuery = await ref.watch(wordProgressRepositoryProvider.future);
   
-  // Total words for calculating daily goal
   final totalWords = allWordsQuery.length;
   final goal = ref.watch(dailyGoalProvider(totalWords: totalWords));
 
   final now = DateTime.now();
   final todayMidnight = DateTime(now.year, now.month, now.day);
+
+  int reviewedTodayCount = 0;
+  for (final prog in progressQuery.values) {
+    if (prog.lastReviewDate != null) {
+      final lrDate = DateTime(prog.lastReviewDate!.year, prog.lastReviewDate!.month, prog.lastReviewDate!.day);
+      if (lrDate.isAtSameMomentAs(todayMidnight)) {
+        reviewedTodayCount++;
+      }
+    }
+  }
+
+  final remainingGoal = (goal > 0 ? goal : 50) - reviewedTodayCount;
+  if (remainingGoal <= 0) return []; // Daily limit reached!
 
   List<GreWord> dueWords = [];
   List<GreWord> newWords = [];
@@ -58,6 +77,11 @@ Future<List<GreWord>> reviewSession(ReviewSessionRef ref) async {
     if (prog == null) {
       newWords.add(word);
     } else {
+      if (prog.lastReviewDate != null) {
+        final lrDate = DateTime(prog.lastReviewDate!.year, prog.lastReviewDate!.month, prog.lastReviewDate!.day);
+        if (lrDate.isAtSameMomentAs(todayMidnight)) continue; // Already reviewed today!
+      }
+
       // If nextReviewDate is today or past
       final reviewDate = DateTime(prog.nextReviewDate.year, prog.nextReviewDate.month, prog.nextReviewDate.day);
       if (reviewDate.compareTo(todayMidnight) <= 0) {
@@ -75,5 +99,5 @@ Future<List<GreWord>> reviewSession(ReviewSessionRef ref) async {
   session.addAll(dueWords);
   session.addAll(newWords);
 
-  return session.take(goal > 0 ? goal : 50).toList(); // Safe fallback to 50 if goal is 0 somehow
+  return session.take(remainingGoal).toList();
 }

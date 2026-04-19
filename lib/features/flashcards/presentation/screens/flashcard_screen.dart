@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wisdom_gre_app/features/arena/presentation/screens/arena_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wisdom_gre_app/core/components/mesh_background.dart';
 import 'package:wisdom_gre_app/core/theme/app_theme.dart';
@@ -51,6 +52,39 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: IconThemeData(color: themeData.textColor),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.restart_alt, color: themeData.textColor),
+            tooltip: 'Reset Progress',
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  backgroundColor: themeData.surfaceColor,
+                  title: Text('Reset Progress?', style: TextStyle(color: themeData.textColor)),
+                  content: Text(
+                    'This will erase all your flashcard progress and start from scratch. Are you sure?',
+                    style: TextStyle(color: themeData.textColor),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: Text('Cancel', style: TextStyle(color: themeData.textColor.withOpacity(0.7))),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+                      onPressed: () {
+                        ref.read(wordProgressRepositoryProvider.notifier).resetAllProgress();
+                        Navigator.pop(ctx);
+                      },
+                      child: const Text('Reset', style: TextStyle(color: Colors.white)),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: MeshBackground(
         child: sessionAsync.when(
@@ -83,6 +117,24 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen> {
                       style: TextStyle(
                         fontSize: 16,
                         color: themeData.textColor.withOpacity(0.8),
+                      ),
+                    ),
+                    const SizedBox(height: 48),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const ArenaScreen()));
+                      },
+                      icon: const Icon(Icons.shield, color: Colors.white),
+                      label: const Text(
+                        'Test your knowledge in the Arena!',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFED8F03),
+                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        elevation: 10,
+                        shadowColor: const Color(0xFFED8F03).withOpacity(0.5),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                       ),
                     ),
                   ],

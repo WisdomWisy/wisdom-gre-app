@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$GreWord {
 
-@JsonKey(name: 'original_input') String get originalInput; String get word; String get phonetic; String get difficulty;@JsonKey(name: 'part_of_speech') String get partOfSpeech;@JsonKey(name: 'definition_en') String get definitionEn; WordTranslations get translations; List<String> get synonyms; List<String> get antonyms;@JsonKey(name: 'gre_context_sentences') List<String> get greContextSentences; WordMnemonics get mnemonics; WordEtymology get etymology;@JsonKey(name: 'audio_file') String get audioFile;
+@JsonKey(name: 'original_input') String get originalInput; String get word; String get phonetic; String get difficulty;@JsonKey(name: 'part_of_speech') String get partOfSpeech;@JsonKey(name: 'definition_en') String get definitionEn; WordTranslations get translations; List<String> get synonyms; List<String> get antonyms;@JsonKey(name: 'gre_context_sentences') List<String> get greContextSentences; WordMnemonics get mnemonics; WordEtymology get etymology;@JsonKey(name: 'audio_file') String get audioFile;@JsonKey(name: 'practice_questions') PracticeQuestions? get practiceQuestions;
 /// Create a copy of GreWord
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $GreWordCopyWith<GreWord> get copyWith => _$GreWordCopyWithImpl<GreWord>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GreWord&&(identical(other.originalInput, originalInput) || other.originalInput == originalInput)&&(identical(other.word, word) || other.word == word)&&(identical(other.phonetic, phonetic) || other.phonetic == phonetic)&&(identical(other.difficulty, difficulty) || other.difficulty == difficulty)&&(identical(other.partOfSpeech, partOfSpeech) || other.partOfSpeech == partOfSpeech)&&(identical(other.definitionEn, definitionEn) || other.definitionEn == definitionEn)&&(identical(other.translations, translations) || other.translations == translations)&&const DeepCollectionEquality().equals(other.synonyms, synonyms)&&const DeepCollectionEquality().equals(other.antonyms, antonyms)&&const DeepCollectionEquality().equals(other.greContextSentences, greContextSentences)&&(identical(other.mnemonics, mnemonics) || other.mnemonics == mnemonics)&&(identical(other.etymology, etymology) || other.etymology == etymology)&&(identical(other.audioFile, audioFile) || other.audioFile == audioFile));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GreWord&&(identical(other.originalInput, originalInput) || other.originalInput == originalInput)&&(identical(other.word, word) || other.word == word)&&(identical(other.phonetic, phonetic) || other.phonetic == phonetic)&&(identical(other.difficulty, difficulty) || other.difficulty == difficulty)&&(identical(other.partOfSpeech, partOfSpeech) || other.partOfSpeech == partOfSpeech)&&(identical(other.definitionEn, definitionEn) || other.definitionEn == definitionEn)&&(identical(other.translations, translations) || other.translations == translations)&&const DeepCollectionEquality().equals(other.synonyms, synonyms)&&const DeepCollectionEquality().equals(other.antonyms, antonyms)&&const DeepCollectionEquality().equals(other.greContextSentences, greContextSentences)&&(identical(other.mnemonics, mnemonics) || other.mnemonics == mnemonics)&&(identical(other.etymology, etymology) || other.etymology == etymology)&&(identical(other.audioFile, audioFile) || other.audioFile == audioFile)&&(identical(other.practiceQuestions, practiceQuestions) || other.practiceQuestions == practiceQuestions));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,originalInput,word,phonetic,difficulty,partOfSpeech,definitionEn,translations,const DeepCollectionEquality().hash(synonyms),const DeepCollectionEquality().hash(antonyms),const DeepCollectionEquality().hash(greContextSentences),mnemonics,etymology,audioFile);
+int get hashCode => Object.hash(runtimeType,originalInput,word,phonetic,difficulty,partOfSpeech,definitionEn,translations,const DeepCollectionEquality().hash(synonyms),const DeepCollectionEquality().hash(antonyms),const DeepCollectionEquality().hash(greContextSentences),mnemonics,etymology,audioFile,practiceQuestions);
 
 @override
 String toString() {
-  return 'GreWord(originalInput: $originalInput, word: $word, phonetic: $phonetic, difficulty: $difficulty, partOfSpeech: $partOfSpeech, definitionEn: $definitionEn, translations: $translations, synonyms: $synonyms, antonyms: $antonyms, greContextSentences: $greContextSentences, mnemonics: $mnemonics, etymology: $etymology, audioFile: $audioFile)';
+  return 'GreWord(originalInput: $originalInput, word: $word, phonetic: $phonetic, difficulty: $difficulty, partOfSpeech: $partOfSpeech, definitionEn: $definitionEn, translations: $translations, synonyms: $synonyms, antonyms: $antonyms, greContextSentences: $greContextSentences, mnemonics: $mnemonics, etymology: $etymology, audioFile: $audioFile, practiceQuestions: $practiceQuestions)';
 }
 
 
@@ -48,11 +48,11 @@ abstract mixin class $GreWordCopyWith<$Res>  {
   factory $GreWordCopyWith(GreWord value, $Res Function(GreWord) _then) = _$GreWordCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'original_input') String originalInput, String word, String phonetic, String difficulty,@JsonKey(name: 'part_of_speech') String partOfSpeech,@JsonKey(name: 'definition_en') String definitionEn, WordTranslations translations, List<String> synonyms, List<String> antonyms,@JsonKey(name: 'gre_context_sentences') List<String> greContextSentences, WordMnemonics mnemonics, WordEtymology etymology,@JsonKey(name: 'audio_file') String audioFile
+@JsonKey(name: 'original_input') String originalInput, String word, String phonetic, String difficulty,@JsonKey(name: 'part_of_speech') String partOfSpeech,@JsonKey(name: 'definition_en') String definitionEn, WordTranslations translations, List<String> synonyms, List<String> antonyms,@JsonKey(name: 'gre_context_sentences') List<String> greContextSentences, WordMnemonics mnemonics, WordEtymology etymology,@JsonKey(name: 'audio_file') String audioFile,@JsonKey(name: 'practice_questions') PracticeQuestions? practiceQuestions
 });
 
 
-$WordTranslationsCopyWith<$Res> get translations;$WordMnemonicsCopyWith<$Res> get mnemonics;$WordEtymologyCopyWith<$Res> get etymology;
+$WordTranslationsCopyWith<$Res> get translations;$WordMnemonicsCopyWith<$Res> get mnemonics;$WordEtymologyCopyWith<$Res> get etymology;$PracticeQuestionsCopyWith<$Res>? get practiceQuestions;
 
 }
 /// @nodoc
@@ -65,7 +65,7 @@ class _$GreWordCopyWithImpl<$Res>
 
 /// Create a copy of GreWord
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? originalInput = null,Object? word = null,Object? phonetic = null,Object? difficulty = null,Object? partOfSpeech = null,Object? definitionEn = null,Object? translations = null,Object? synonyms = null,Object? antonyms = null,Object? greContextSentences = null,Object? mnemonics = null,Object? etymology = null,Object? audioFile = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? originalInput = null,Object? word = null,Object? phonetic = null,Object? difficulty = null,Object? partOfSpeech = null,Object? definitionEn = null,Object? translations = null,Object? synonyms = null,Object? antonyms = null,Object? greContextSentences = null,Object? mnemonics = null,Object? etymology = null,Object? audioFile = null,Object? practiceQuestions = freezed,}) {
   return _then(_self.copyWith(
 originalInput: null == originalInput ? _self.originalInput : originalInput // ignore: cast_nullable_to_non_nullable
 as String,word: null == word ? _self.word : word // ignore: cast_nullable_to_non_nullable
@@ -80,7 +80,8 @@ as List<String>,greContextSentences: null == greContextSentences ? _self.greCont
 as List<String>,mnemonics: null == mnemonics ? _self.mnemonics : mnemonics // ignore: cast_nullable_to_non_nullable
 as WordMnemonics,etymology: null == etymology ? _self.etymology : etymology // ignore: cast_nullable_to_non_nullable
 as WordEtymology,audioFile: null == audioFile ? _self.audioFile : audioFile // ignore: cast_nullable_to_non_nullable
-as String,
+as String,practiceQuestions: freezed == practiceQuestions ? _self.practiceQuestions : practiceQuestions // ignore: cast_nullable_to_non_nullable
+as PracticeQuestions?,
   ));
 }
 /// Create a copy of GreWord
@@ -109,6 +110,18 @@ $WordEtymologyCopyWith<$Res> get etymology {
   
   return $WordEtymologyCopyWith<$Res>(_self.etymology, (value) {
     return _then(_self.copyWith(etymology: value));
+  });
+}/// Create a copy of GreWord
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PracticeQuestionsCopyWith<$Res>? get practiceQuestions {
+    if (_self.practiceQuestions == null) {
+    return null;
+  }
+
+  return $PracticeQuestionsCopyWith<$Res>(_self.practiceQuestions!, (value) {
+    return _then(_self.copyWith(practiceQuestions: value));
   });
 }
 }
@@ -192,10 +205,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'original_input')  String originalInput,  String word,  String phonetic,  String difficulty, @JsonKey(name: 'part_of_speech')  String partOfSpeech, @JsonKey(name: 'definition_en')  String definitionEn,  WordTranslations translations,  List<String> synonyms,  List<String> antonyms, @JsonKey(name: 'gre_context_sentences')  List<String> greContextSentences,  WordMnemonics mnemonics,  WordEtymology etymology, @JsonKey(name: 'audio_file')  String audioFile)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'original_input')  String originalInput,  String word,  String phonetic,  String difficulty, @JsonKey(name: 'part_of_speech')  String partOfSpeech, @JsonKey(name: 'definition_en')  String definitionEn,  WordTranslations translations,  List<String> synonyms,  List<String> antonyms, @JsonKey(name: 'gre_context_sentences')  List<String> greContextSentences,  WordMnemonics mnemonics,  WordEtymology etymology, @JsonKey(name: 'audio_file')  String audioFile, @JsonKey(name: 'practice_questions')  PracticeQuestions? practiceQuestions)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _GreWord() when $default != null:
-return $default(_that.originalInput,_that.word,_that.phonetic,_that.difficulty,_that.partOfSpeech,_that.definitionEn,_that.translations,_that.synonyms,_that.antonyms,_that.greContextSentences,_that.mnemonics,_that.etymology,_that.audioFile);case _:
+return $default(_that.originalInput,_that.word,_that.phonetic,_that.difficulty,_that.partOfSpeech,_that.definitionEn,_that.translations,_that.synonyms,_that.antonyms,_that.greContextSentences,_that.mnemonics,_that.etymology,_that.audioFile,_that.practiceQuestions);case _:
   return orElse();
 
 }
@@ -213,10 +226,10 @@ return $default(_that.originalInput,_that.word,_that.phonetic,_that.difficulty,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'original_input')  String originalInput,  String word,  String phonetic,  String difficulty, @JsonKey(name: 'part_of_speech')  String partOfSpeech, @JsonKey(name: 'definition_en')  String definitionEn,  WordTranslations translations,  List<String> synonyms,  List<String> antonyms, @JsonKey(name: 'gre_context_sentences')  List<String> greContextSentences,  WordMnemonics mnemonics,  WordEtymology etymology, @JsonKey(name: 'audio_file')  String audioFile)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'original_input')  String originalInput,  String word,  String phonetic,  String difficulty, @JsonKey(name: 'part_of_speech')  String partOfSpeech, @JsonKey(name: 'definition_en')  String definitionEn,  WordTranslations translations,  List<String> synonyms,  List<String> antonyms, @JsonKey(name: 'gre_context_sentences')  List<String> greContextSentences,  WordMnemonics mnemonics,  WordEtymology etymology, @JsonKey(name: 'audio_file')  String audioFile, @JsonKey(name: 'practice_questions')  PracticeQuestions? practiceQuestions)  $default,) {final _that = this;
 switch (_that) {
 case _GreWord():
-return $default(_that.originalInput,_that.word,_that.phonetic,_that.difficulty,_that.partOfSpeech,_that.definitionEn,_that.translations,_that.synonyms,_that.antonyms,_that.greContextSentences,_that.mnemonics,_that.etymology,_that.audioFile);case _:
+return $default(_that.originalInput,_that.word,_that.phonetic,_that.difficulty,_that.partOfSpeech,_that.definitionEn,_that.translations,_that.synonyms,_that.antonyms,_that.greContextSentences,_that.mnemonics,_that.etymology,_that.audioFile,_that.practiceQuestions);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -233,10 +246,10 @@ return $default(_that.originalInput,_that.word,_that.phonetic,_that.difficulty,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'original_input')  String originalInput,  String word,  String phonetic,  String difficulty, @JsonKey(name: 'part_of_speech')  String partOfSpeech, @JsonKey(name: 'definition_en')  String definitionEn,  WordTranslations translations,  List<String> synonyms,  List<String> antonyms, @JsonKey(name: 'gre_context_sentences')  List<String> greContextSentences,  WordMnemonics mnemonics,  WordEtymology etymology, @JsonKey(name: 'audio_file')  String audioFile)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'original_input')  String originalInput,  String word,  String phonetic,  String difficulty, @JsonKey(name: 'part_of_speech')  String partOfSpeech, @JsonKey(name: 'definition_en')  String definitionEn,  WordTranslations translations,  List<String> synonyms,  List<String> antonyms, @JsonKey(name: 'gre_context_sentences')  List<String> greContextSentences,  WordMnemonics mnemonics,  WordEtymology etymology, @JsonKey(name: 'audio_file')  String audioFile, @JsonKey(name: 'practice_questions')  PracticeQuestions? practiceQuestions)?  $default,) {final _that = this;
 switch (_that) {
 case _GreWord() when $default != null:
-return $default(_that.originalInput,_that.word,_that.phonetic,_that.difficulty,_that.partOfSpeech,_that.definitionEn,_that.translations,_that.synonyms,_that.antonyms,_that.greContextSentences,_that.mnemonics,_that.etymology,_that.audioFile);case _:
+return $default(_that.originalInput,_that.word,_that.phonetic,_that.difficulty,_that.partOfSpeech,_that.definitionEn,_that.translations,_that.synonyms,_that.antonyms,_that.greContextSentences,_that.mnemonics,_that.etymology,_that.audioFile,_that.practiceQuestions);case _:
   return null;
 
 }
@@ -248,7 +261,7 @@ return $default(_that.originalInput,_that.word,_that.phonetic,_that.difficulty,_
 @JsonSerializable()
 
 class _GreWord implements GreWord {
-  const _GreWord({@JsonKey(name: 'original_input') required this.originalInput, required this.word, required this.phonetic, required this.difficulty, @JsonKey(name: 'part_of_speech') required this.partOfSpeech, @JsonKey(name: 'definition_en') required this.definitionEn, required this.translations, required final  List<String> synonyms, required final  List<String> antonyms, @JsonKey(name: 'gre_context_sentences') required final  List<String> greContextSentences, required this.mnemonics, required this.etymology, @JsonKey(name: 'audio_file') required this.audioFile}): _synonyms = synonyms,_antonyms = antonyms,_greContextSentences = greContextSentences;
+  const _GreWord({@JsonKey(name: 'original_input') required this.originalInput, required this.word, required this.phonetic, required this.difficulty, @JsonKey(name: 'part_of_speech') required this.partOfSpeech, @JsonKey(name: 'definition_en') required this.definitionEn, required this.translations, required final  List<String> synonyms, required final  List<String> antonyms, @JsonKey(name: 'gre_context_sentences') required final  List<String> greContextSentences, required this.mnemonics, required this.etymology, @JsonKey(name: 'audio_file') required this.audioFile, @JsonKey(name: 'practice_questions') this.practiceQuestions}): _synonyms = synonyms,_antonyms = antonyms,_greContextSentences = greContextSentences;
   factory _GreWord.fromJson(Map<String, dynamic> json) => _$GreWordFromJson(json);
 
 @override@JsonKey(name: 'original_input') final  String originalInput;
@@ -282,6 +295,7 @@ class _GreWord implements GreWord {
 @override final  WordMnemonics mnemonics;
 @override final  WordEtymology etymology;
 @override@JsonKey(name: 'audio_file') final  String audioFile;
+@override@JsonKey(name: 'practice_questions') final  PracticeQuestions? practiceQuestions;
 
 /// Create a copy of GreWord
 /// with the given fields replaced by the non-null parameter values.
@@ -296,16 +310,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GreWord&&(identical(other.originalInput, originalInput) || other.originalInput == originalInput)&&(identical(other.word, word) || other.word == word)&&(identical(other.phonetic, phonetic) || other.phonetic == phonetic)&&(identical(other.difficulty, difficulty) || other.difficulty == difficulty)&&(identical(other.partOfSpeech, partOfSpeech) || other.partOfSpeech == partOfSpeech)&&(identical(other.definitionEn, definitionEn) || other.definitionEn == definitionEn)&&(identical(other.translations, translations) || other.translations == translations)&&const DeepCollectionEquality().equals(other._synonyms, _synonyms)&&const DeepCollectionEquality().equals(other._antonyms, _antonyms)&&const DeepCollectionEquality().equals(other._greContextSentences, _greContextSentences)&&(identical(other.mnemonics, mnemonics) || other.mnemonics == mnemonics)&&(identical(other.etymology, etymology) || other.etymology == etymology)&&(identical(other.audioFile, audioFile) || other.audioFile == audioFile));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GreWord&&(identical(other.originalInput, originalInput) || other.originalInput == originalInput)&&(identical(other.word, word) || other.word == word)&&(identical(other.phonetic, phonetic) || other.phonetic == phonetic)&&(identical(other.difficulty, difficulty) || other.difficulty == difficulty)&&(identical(other.partOfSpeech, partOfSpeech) || other.partOfSpeech == partOfSpeech)&&(identical(other.definitionEn, definitionEn) || other.definitionEn == definitionEn)&&(identical(other.translations, translations) || other.translations == translations)&&const DeepCollectionEquality().equals(other._synonyms, _synonyms)&&const DeepCollectionEquality().equals(other._antonyms, _antonyms)&&const DeepCollectionEquality().equals(other._greContextSentences, _greContextSentences)&&(identical(other.mnemonics, mnemonics) || other.mnemonics == mnemonics)&&(identical(other.etymology, etymology) || other.etymology == etymology)&&(identical(other.audioFile, audioFile) || other.audioFile == audioFile)&&(identical(other.practiceQuestions, practiceQuestions) || other.practiceQuestions == practiceQuestions));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,originalInput,word,phonetic,difficulty,partOfSpeech,definitionEn,translations,const DeepCollectionEquality().hash(_synonyms),const DeepCollectionEquality().hash(_antonyms),const DeepCollectionEquality().hash(_greContextSentences),mnemonics,etymology,audioFile);
+int get hashCode => Object.hash(runtimeType,originalInput,word,phonetic,difficulty,partOfSpeech,definitionEn,translations,const DeepCollectionEquality().hash(_synonyms),const DeepCollectionEquality().hash(_antonyms),const DeepCollectionEquality().hash(_greContextSentences),mnemonics,etymology,audioFile,practiceQuestions);
 
 @override
 String toString() {
-  return 'GreWord(originalInput: $originalInput, word: $word, phonetic: $phonetic, difficulty: $difficulty, partOfSpeech: $partOfSpeech, definitionEn: $definitionEn, translations: $translations, synonyms: $synonyms, antonyms: $antonyms, greContextSentences: $greContextSentences, mnemonics: $mnemonics, etymology: $etymology, audioFile: $audioFile)';
+  return 'GreWord(originalInput: $originalInput, word: $word, phonetic: $phonetic, difficulty: $difficulty, partOfSpeech: $partOfSpeech, definitionEn: $definitionEn, translations: $translations, synonyms: $synonyms, antonyms: $antonyms, greContextSentences: $greContextSentences, mnemonics: $mnemonics, etymology: $etymology, audioFile: $audioFile, practiceQuestions: $practiceQuestions)';
 }
 
 
@@ -316,11 +330,11 @@ abstract mixin class _$GreWordCopyWith<$Res> implements $GreWordCopyWith<$Res> {
   factory _$GreWordCopyWith(_GreWord value, $Res Function(_GreWord) _then) = __$GreWordCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'original_input') String originalInput, String word, String phonetic, String difficulty,@JsonKey(name: 'part_of_speech') String partOfSpeech,@JsonKey(name: 'definition_en') String definitionEn, WordTranslations translations, List<String> synonyms, List<String> antonyms,@JsonKey(name: 'gre_context_sentences') List<String> greContextSentences, WordMnemonics mnemonics, WordEtymology etymology,@JsonKey(name: 'audio_file') String audioFile
+@JsonKey(name: 'original_input') String originalInput, String word, String phonetic, String difficulty,@JsonKey(name: 'part_of_speech') String partOfSpeech,@JsonKey(name: 'definition_en') String definitionEn, WordTranslations translations, List<String> synonyms, List<String> antonyms,@JsonKey(name: 'gre_context_sentences') List<String> greContextSentences, WordMnemonics mnemonics, WordEtymology etymology,@JsonKey(name: 'audio_file') String audioFile,@JsonKey(name: 'practice_questions') PracticeQuestions? practiceQuestions
 });
 
 
-@override $WordTranslationsCopyWith<$Res> get translations;@override $WordMnemonicsCopyWith<$Res> get mnemonics;@override $WordEtymologyCopyWith<$Res> get etymology;
+@override $WordTranslationsCopyWith<$Res> get translations;@override $WordMnemonicsCopyWith<$Res> get mnemonics;@override $WordEtymologyCopyWith<$Res> get etymology;@override $PracticeQuestionsCopyWith<$Res>? get practiceQuestions;
 
 }
 /// @nodoc
@@ -333,7 +347,7 @@ class __$GreWordCopyWithImpl<$Res>
 
 /// Create a copy of GreWord
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? originalInput = null,Object? word = null,Object? phonetic = null,Object? difficulty = null,Object? partOfSpeech = null,Object? definitionEn = null,Object? translations = null,Object? synonyms = null,Object? antonyms = null,Object? greContextSentences = null,Object? mnemonics = null,Object? etymology = null,Object? audioFile = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? originalInput = null,Object? word = null,Object? phonetic = null,Object? difficulty = null,Object? partOfSpeech = null,Object? definitionEn = null,Object? translations = null,Object? synonyms = null,Object? antonyms = null,Object? greContextSentences = null,Object? mnemonics = null,Object? etymology = null,Object? audioFile = null,Object? practiceQuestions = freezed,}) {
   return _then(_GreWord(
 originalInput: null == originalInput ? _self.originalInput : originalInput // ignore: cast_nullable_to_non_nullable
 as String,word: null == word ? _self.word : word // ignore: cast_nullable_to_non_nullable
@@ -348,7 +362,8 @@ as List<String>,greContextSentences: null == greContextSentences ? _self._greCon
 as List<String>,mnemonics: null == mnemonics ? _self.mnemonics : mnemonics // ignore: cast_nullable_to_non_nullable
 as WordMnemonics,etymology: null == etymology ? _self.etymology : etymology // ignore: cast_nullable_to_non_nullable
 as WordEtymology,audioFile: null == audioFile ? _self.audioFile : audioFile // ignore: cast_nullable_to_non_nullable
-as String,
+as String,practiceQuestions: freezed == practiceQuestions ? _self.practiceQuestions : practiceQuestions // ignore: cast_nullable_to_non_nullable
+as PracticeQuestions?,
   ));
 }
 
@@ -378,6 +393,18 @@ $WordEtymologyCopyWith<$Res> get etymology {
   
   return $WordEtymologyCopyWith<$Res>(_self.etymology, (value) {
     return _then(_self.copyWith(etymology: value));
+  });
+}/// Create a copy of GreWord
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PracticeQuestionsCopyWith<$Res>? get practiceQuestions {
+    if (_self.practiceQuestions == null) {
+    return null;
+  }
+
+  return $PracticeQuestionsCopyWith<$Res>(_self.practiceQuestions!, (value) {
+    return _then(_self.copyWith(practiceQuestions: value));
   });
 }
 }

@@ -6,7 +6,7 @@ part of 'review_session_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$reviewSessionHash() => r'4763d9e70a472225282febce4344651c3eb53ffa';
+String _$reviewSessionHash() => r'fefc6ac9b83c7b12b15c1e6c1fa20e07c958280d';
 
 /// Represents the session queue for the day
 ///
@@ -27,7 +27,7 @@ final reviewSessionProvider = AutoDisposeFutureProvider<List<GreWord>>.internal(
 // ignore: unused_element
 typedef ReviewSessionRef = AutoDisposeFutureProviderRef<List<GreWord>>;
 String _$wordProgressRepositoryHash() =>
-    r'ff279ac4298b38064be35760386a1213993cedf2';
+    r'77e72e0c386a779d56676bfa2c848edfcc2495e7';
 
 /// See also [WordProgressRepository].
 @ProviderFor(WordProgressRepository)

@@ -11,6 +11,7 @@ abstract class WordProgress with _$WordProgress {
     @Default(0) int interval,
     @Default(0) int repetitions,
     required DateTime nextReviewDate,
+    DateTime? lastReviewDate,
   }) = _WordProgress;
 
   factory WordProgress.fromJson(Map<String, dynamic> json) => _$WordProgressFromJson(json);

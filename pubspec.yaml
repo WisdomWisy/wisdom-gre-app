@@ -46,6 +46,7 @@ dependencies:
   wakelock_plus: ^1.4.0
   audio_session: ^0.2.3
   flutter_foreground_task: ^9.2.2
+  google_fonts: ^6.3.2
 
 dev_dependencies:
   flutter_test:

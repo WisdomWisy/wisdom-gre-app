@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WordProgress {
 
- String get wordId; double get easinessFactor; int get interval; int get repetitions; DateTime get nextReviewDate;
+ String get wordId; double get easinessFactor; int get interval; int get repetitions; DateTime get nextReviewDate; DateTime? get lastReviewDate;
 /// Create a copy of WordProgress
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $WordProgressCopyWith<WordProgress> get copyWith => _$WordProgressCopyWithImpl<W
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WordProgress&&(identical(other.wordId, wordId) || other.wordId == wordId)&&(identical(other.easinessFactor, easinessFactor) || other.easinessFactor == easinessFactor)&&(identical(other.interval, interval) || other.interval == interval)&&(identical(other.repetitions, repetitions) || other.repetitions == repetitions)&&(identical(other.nextReviewDate, nextReviewDate) || other.nextReviewDate == nextReviewDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WordProgress&&(identical(other.wordId, wordId) || other.wordId == wordId)&&(identical(other.easinessFactor, easinessFactor) || other.easinessFactor == easinessFactor)&&(identical(other.interval, interval) || other.interval == interval)&&(identical(other.repetitions, repetitions) || other.repetitions == repetitions)&&(identical(other.nextReviewDate, nextReviewDate) || other.nextReviewDate == nextReviewDate)&&(identical(other.lastReviewDate, lastReviewDate) || other.lastReviewDate == lastReviewDate));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,wordId,easinessFactor,interval,repetitions,nextReviewDate);
+int get hashCode => Object.hash(runtimeType,wordId,easinessFactor,interval,repetitions,nextReviewDate,lastReviewDate);
 
 @override
 String toString() {
-  return 'WordProgress(wordId: $wordId, easinessFactor: $easinessFactor, interval: $interval, repetitions: $repetitions, nextReviewDate: $nextReviewDate)';
+  return 'WordProgress(wordId: $wordId, easinessFactor: $easinessFactor, interval: $interval, repetitions: $repetitions, nextReviewDate: $nextReviewDate, lastReviewDate: $lastReviewDate)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $WordProgressCopyWith<$Res>  {
   factory $WordProgressCopyWith(WordProgress value, $Res Function(WordProgress) _then) = _$WordProgressCopyWithImpl;
 @useResult
 $Res call({
- String wordId, double easinessFactor, int interval, int repetitions, DateTime nextReviewDate
+ String wordId, double easinessFactor, int interval, int repetitions, DateTime nextReviewDate, DateTime? lastReviewDate
 });
 
 
@@ -65,14 +65,15 @@ class _$WordProgressCopyWithImpl<$Res>
 
 /// Create a copy of WordProgress
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? wordId = null,Object? easinessFactor = null,Object? interval = null,Object? repetitions = null,Object? nextReviewDate = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? wordId = null,Object? easinessFactor = null,Object? interval = null,Object? repetitions = null,Object? nextReviewDate = null,Object? lastReviewDate = freezed,}) {
   return _then(_self.copyWith(
 wordId: null == wordId ? _self.wordId : wordId // ignore: cast_nullable_to_non_nullable
 as String,easinessFactor: null == easinessFactor ? _self.easinessFactor : easinessFactor // ignore: cast_nullable_to_non_nullable
 as double,interval: null == interval ? _self.interval : interval // ignore: cast_nullable_to_non_nullable
 as int,repetitions: null == repetitions ? _self.repetitions : repetitions // ignore: cast_nullable_to_non_nullable
 as int,nextReviewDate: null == nextReviewDate ? _self.nextReviewDate : nextReviewDate // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as DateTime,lastReviewDate: freezed == lastReviewDate ? _self.lastReviewDate : lastReviewDate // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 
@@ -157,10 +158,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String wordId,  double easinessFactor,  int interval,  int repetitions,  DateTime nextReviewDate)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String wordId,  double easinessFactor,  int interval,  int repetitions,  DateTime nextReviewDate,  DateTime? lastReviewDate)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WordProgress() when $default != null:
-return $default(_that.wordId,_that.easinessFactor,_that.interval,_that.repetitions,_that.nextReviewDate);case _:
+return $default(_that.wordId,_that.easinessFactor,_that.interval,_that.repetitions,_that.nextReviewDate,_that.lastReviewDate);case _:
   return orElse();
 
 }
@@ -178,10 +179,10 @@ return $default(_that.wordId,_that.easinessFactor,_that.interval,_that.repetitio
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String wordId,  double easinessFactor,  int interval,  int repetitions,  DateTime nextReviewDate)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String wordId,  double easinessFactor,  int interval,  int repetitions,  DateTime nextReviewDate,  DateTime? lastReviewDate)  $default,) {final _that = this;
 switch (_that) {
 case _WordProgress():
-return $default(_that.wordId,_that.easinessFactor,_that.interval,_that.repetitions,_that.nextReviewDate);case _:
+return $default(_that.wordId,_that.easinessFactor,_that.interval,_that.repetitions,_that.nextReviewDate,_that.lastReviewDate);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -198,10 +199,10 @@ return $default(_that.wordId,_that.easinessFactor,_that.interval,_that.repetitio
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String wordId,  double easinessFactor,  int interval,  int repetitions,  DateTime nextReviewDate)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String wordId,  double easinessFactor,  int interval,  int repetitions,  DateTime nextReviewDate,  DateTime? lastReviewDate)?  $default,) {final _that = this;
 switch (_that) {
 case _WordProgress() when $default != null:
-return $default(_that.wordId,_that.easinessFactor,_that.interval,_that.repetitions,_that.nextReviewDate);case _:
+return $default(_that.wordId,_that.easinessFactor,_that.interval,_that.repetitions,_that.nextReviewDate,_that.lastReviewDate);case _:
   return null;
 
 }
@@ -213,7 +214,7 @@ return $default(_that.wordId,_that.easinessFactor,_that.interval,_that.repetitio
 @JsonSerializable()
 
 class _WordProgress implements WordProgress {
-  const _WordProgress({required this.wordId, this.easinessFactor = 2.5, this.interval = 0, this.repetitions = 0, required this.nextReviewDate});
+  const _WordProgress({required this.wordId, this.easinessFactor = 2.5, this.interval = 0, this.repetitions = 0, required this.nextReviewDate, this.lastReviewDate});
   factory _WordProgress.fromJson(Map<String, dynamic> json) => _$WordProgressFromJson(json);
 
 @override final  String wordId;
@@ -221,6 +222,7 @@ class _WordProgress implements WordProgress {
 @override@JsonKey() final  int interval;
 @override@JsonKey() final  int repetitions;
 @override final  DateTime nextReviewDate;
+@override final  DateTime? lastReviewDate;
 
 /// Create a copy of WordProgress
 /// with the given fields replaced by the non-null parameter values.
@@ -235,16 +237,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WordProgress&&(identical(other.wordId, wordId) || other.wordId == wordId)&&(identical(other.easinessFactor, easinessFactor) || other.easinessFactor == easinessFactor)&&(identical(other.interval, interval) || other.interval == interval)&&(identical(other.repetitions, repetitions) || other.repetitions == repetitions)&&(identical(other.nextReviewDate, nextReviewDate) || other.nextReviewDate == nextReviewDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _WordProgress&&(identical(other.wordId, wordId) || other.wordId == wordId)&&(identical(other.easinessFactor, easinessFactor) || other.easinessFactor == easinessFactor)&&(identical(other.interval, interval) || other.interval == interval)&&(identical(other.repetitions, repetitions) || other.repetitions == repetitions)&&(identical(other.nextReviewDate, nextReviewDate) || other.nextReviewDate == nextReviewDate)&&(identical(other.lastReviewDate, lastReviewDate) || other.lastReviewDate == lastReviewDate));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,wordId,easinessFactor,interval,repetitions,nextReviewDate);
+int get hashCode => Object.hash(runtimeType,wordId,easinessFactor,interval,repetitions,nextReviewDate,lastReviewDate);
 
 @override
 String toString() {
-  return 'WordProgress(wordId: $wordId, easinessFactor: $easinessFactor, interval: $interval, repetitions: $repetitions, nextReviewDate: $nextReviewDate)';
+  return 'WordProgress(wordId: $wordId, easinessFactor: $easinessFactor, interval: $interval, repetitions: $repetitions, nextReviewDate: $nextReviewDate, lastReviewDate: $lastReviewDate)';
 }
 
 
@@ -255,7 +257,7 @@ abstract mixin class _$WordProgressCopyWith<$Res> implements $WordProgressCopyWi
   factory _$WordProgressCopyWith(_WordProgress value, $Res Function(_WordProgress) _then) = __$WordProgressCopyWithImpl;
 @override @useResult
 $Res call({
- String wordId, double easinessFactor, int interval, int repetitions, DateTime nextReviewDate
+ String wordId, double easinessFactor, int interval, int repetitions, DateTime nextReviewDate, DateTime? lastReviewDate
 });
 
 
@@ -272,14 +274,15 @@ class __$WordProgressCopyWithImpl<$Res>
 
 /// Create a copy of WordProgress
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? wordId = null,Object? easinessFactor = null,Object? interval = null,Object? repetitions = null,Object? nextReviewDate = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? wordId = null,Object? easinessFactor = null,Object? interval = null,Object? repetitions = null,Object? nextReviewDate = null,Object? lastReviewDate = freezed,}) {
   return _then(_WordProgress(
 wordId: null == wordId ? _self.wordId : wordId // ignore: cast_nullable_to_non_nullable
 as String,easinessFactor: null == easinessFactor ? _self.easinessFactor : easinessFactor // ignore: cast_nullable_to_non_nullable
 as double,interval: null == interval ? _self.interval : interval // ignore: cast_nullable_to_non_nullable
 as int,repetitions: null == repetitions ? _self.repetitions : repetitions // ignore: cast_nullable_to_non_nullable
 as int,nextReviewDate: null == nextReviewDate ? _self.nextReviewDate : nextReviewDate // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as DateTime,lastReviewDate: freezed == lastReviewDate ? _self.lastReviewDate : lastReviewDate // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 
