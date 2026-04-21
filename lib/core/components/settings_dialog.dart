@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wisdom_gre_app/core/theme/app_theme.dart';
 import 'package:wisdom_gre_app/core/providers/language_provider.dart';
 import 'package:wisdom_gre_app/core/providers/tts_settings_provider.dart';
+import 'package:wisdom_gre_app/features/auth/domain/auth_state_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Application-wide settings dialog.
 ///
@@ -24,9 +26,10 @@ class SettingsDialog extends ConsumerWidget {
       backgroundColor: theme.surfaceColor.withValues(alpha: 0.95),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       title: Text('Settings', style: TextStyle(color: theme.textColor, fontWeight: FontWeight.bold)),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
           // ── Appearance ─────────────────────────────────────
           _SectionHeader('Appearance', theme),
           _SwitchTile(
@@ -42,6 +45,24 @@ class SettingsDialog extends ConsumerWidget {
             value: theme.type == ThemeType.purpleGold,
             theme: theme,
             onChanged: (_) => ref.read(themeControllerProvider.notifier).toggleThemeType(),
+          ),
+
+          const Divider(height: 24),
+          
+          // ── Profile ────────────────────────────────────────
+          _SectionHeader('Account', theme),
+          ListTile(
+            dense: true,
+            leading: Icon(Icons.person_outline, color: theme.textColor),
+            title: Text('Edit Profile', style: TextStyle(color: theme.textColor)),
+            trailing: Icon(Icons.chevron_right, color: theme.textColor),
+            onTap: () {
+              Navigator.pop(context);
+              showDialog(
+                context: context,
+                builder: (context) => const EditProfileDialog(),
+              );
+            },
           ),
 
           const Divider(height: 24),
@@ -110,7 +131,22 @@ class SettingsDialog extends ConsumerWidget {
             onChanged: (val) =>
                 ref.read(ttsSpeechRateControllerProvider.notifier).setRate(val),
           ),
+
+          const Divider(height: 24),
+
+          // ── Account ──────────────────────────────────────────
+          _SectionHeader('Account', theme),
+          ListTile(
+            dense: true,
+            leading: const Icon(Icons.logout, color: Colors.redAccent),
+            title: const Text('Disconnect', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+            onTap: () {
+              ref.read(authControllerProvider.notifier).signOut();
+              Navigator.of(context).pop(); // Close dialog
+            },
+          ),
         ],
+      ),
       ),
       actions: [
         TextButton(
@@ -174,3 +210,95 @@ class _SwitchTile extends StatelessWidget {
     );
   }
 }
+
+class EditProfileDialog extends ConsumerStatefulWidget {
+  const EditProfileDialog({super.key});
+
+  @override
+  ConsumerState<EditProfileDialog> createState() => _EditProfileDialogState();
+}
+
+class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentProfile();
+  }
+  
+  void _loadCurrentProfile() async {
+    final user = ref.read(currentUserProvider);
+    if (user != null) {
+      final res = await Supabase.instance.client.from('profiles').select().eq('id', user.id).maybeSingle();
+      if (res != null) {
+        _firstNameController.text = res['first_name'] ?? '';
+        _lastNameController.text = res['last_name'] ?? '';
+      }
+    }
+  }
+
+  void _saveProfile() async {
+    setState(() => _isLoading = true);
+    try {
+      final user = ref.read(currentUserProvider);
+      if (user != null) {
+        await Supabase.instance.client.from('profiles').update({
+          'first_name': _firstNameController.text.trim(),
+          'last_name': _lastNameController.text.trim(),
+        }).eq('id', user.id);
+        if (mounted) Navigator.pop(context);
+        
+        // Refresh the profile provider manually since the stream might not cache immediately 
+        // depending on real-time setup of profiles, but since we use stream() on profiles it should auto-update.
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ref.watch(themeControllerProvider);
+    
+    return AlertDialog(
+      backgroundColor: theme.surfaceColor,
+      title: Text('Edit Profile', style: TextStyle(color: theme.textColor)),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: _firstNameController,
+            style: TextStyle(color: theme.textColor),
+            decoration: InputDecoration(labelText: 'First Name', labelStyle: TextStyle(color: theme.textColor.withValues(alpha: 0.6))),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _lastNameController,
+            style: TextStyle(color: theme.textColor),
+            decoration: InputDecoration(labelText: 'Last Name', labelStyle: TextStyle(color: theme.textColor.withValues(alpha: 0.6))),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        _isLoading 
+          ? const CircularProgressIndicator()
+          : ElevatedButton(
+              onPressed: _saveProfile,
+              child: const Text('Save'),
+            ),
+      ],
+    );
+  }
+}
+

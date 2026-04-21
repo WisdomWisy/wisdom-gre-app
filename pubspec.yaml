@@ -47,6 +47,9 @@ dependencies:
   audio_session: ^0.2.3
   flutter_foreground_task: ^9.2.2
   google_fonts: ^6.3.2
+  supabase_flutter: ^2.12.4
+  flutter_dotenv: ^6.0.0
+  connectivity_plus: ^7.1.1
 
 dev_dependencies:
   flutter_test:
@@ -78,6 +81,7 @@ flutter:
   assets:
     - gre_database_premium.json
     - audio/
+    - .env
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package

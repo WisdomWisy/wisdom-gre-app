@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:wisdom_gre_app/core/components/mesh_background.dart';
 import 'package:wisdom_gre_app/core/theme/app_theme.dart';
@@ -9,6 +10,9 @@ import 'package:wisdom_gre_app/features/vocabulary/domain/providers/vocabulary_p
 import 'package:wisdom_gre_app/features/flashcards/presentation/screens/flashcard_screen.dart';
 import 'package:wisdom_gre_app/features/podcast/presentation/screens/podcast_screen.dart';
 import 'package:wisdom_gre_app/features/arena/presentation/screens/arena_screen.dart';
+import 'package:wisdom_gre_app/features/multiplayer/presentation/multiplayer_lobby_screen.dart';
+import 'package:wisdom_gre_app/features/multiplayer/presentation/matchmaking_hub_screen.dart';
+import 'package:wisdom_gre_app/features/auth/domain/auth_state_provider.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -18,6 +22,7 @@ class DashboardScreen extends ConsumerWidget {
     final vocabularyAsync = ref.watch(vocabularyProvider);
     final themeData = ref.watch(themeControllerProvider);
     final examDate = ref.watch(examDateProvider);
+    final profileAsync = ref.watch(userProfileProvider);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -44,13 +49,24 @@ class DashboardScreen extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 40),
-              Text(
-                'Welcome Back',
-                style: TextStyle(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                  color: themeData.textColor,
-                  letterSpacing: -0.5,
+              profileAsync.when(
+                data: (profile) => Text(
+                  'Welcome Back, ${profile?.firstName ?? profile?.username ?? 'Scholar'}!',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: themeData.textColor,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                loading: () => const CircularProgressIndicator(),
+                error: (error, stack) => Text(
+                  'Welcome Back!', 
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: themeData.textColor,
+                  ),
                 ),
               ),
               Text(
@@ -238,14 +254,61 @@ class DashboardScreen extends ConsumerWidget {
                                 borderRadius: BorderRadius.circular(20),
                               ),
                             ),
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(builder: (_) => const ArenaScreen()),
-                              );
+                            onPressed: () async {
+                              final List<ConnectivityResult> connectivityResult = await Connectivity().checkConnectivity();
+                              if (connectivityResult.contains(ConnectivityResult.none)) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Offline: Network connection required'), backgroundColor: Colors.orange)
+                                  );
+                                }
+                                return;
+                              }
+                              if (context.mounted) {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(builder: (_) => const ArenaScreen()),
+                                );
+                              }
                             },
                             icon: const Icon(Icons.sports_esports),
                             label: const Text(
                               'Enter The Arena',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: const Color(0xFF00FFCC),
+                              side: BorderSide(color: const Color(0xFF00FFCC).withValues(alpha: 0.5), width: 2),
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              backgroundColor: const Color(0xFF00FFCC).withValues(alpha: 0.05),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            onPressed: () async {
+                              final List<ConnectivityResult> connectivityResult = await Connectivity().checkConnectivity();
+                              if (connectivityResult.contains(ConnectivityResult.none)) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Offline: Network connection required'), backgroundColor: Colors.orange)
+                                  );
+                                }
+                                return;
+                              }
+                              if (context.mounted) {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(builder: (_) => const MatchmakingHubScreen()),
+                                );
+                              }
+                            },
+                            icon: const Icon(Icons.hub),
+                            label: const Text(
+                              'Multiplayer Lobby',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
