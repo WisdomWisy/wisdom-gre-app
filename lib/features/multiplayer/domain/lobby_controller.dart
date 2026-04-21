@@ -225,6 +225,23 @@ class LobbyController extends _$LobbyController {
     }
   }
 
+  Future<void> startBattle(String duelId) async {
+    try {
+      final user = ref.read(currentUserProvider);
+      if (user == null) return;
+
+      final currentDuel = state.valueOrNull;
+      if (currentDuel != null && currentDuel.hostId == user.id) {
+        await Supabase.instance.client
+            .from('duels')
+            .update({'status': 'playing'})
+            .eq('id', duelId);
+      }
+    } catch (e) {
+      // Ignored for broadcast UI logic simplicity
+    }
+  }
+
   Future<void> joinDuel(String code) async {
     state = const AsyncLoading();
     try {

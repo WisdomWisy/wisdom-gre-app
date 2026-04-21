@@ -9,6 +9,7 @@ import 'package:wisdom_gre_app/core/theme/app_theme.dart';
 
 import 'package:wisdom_gre_app/features/multiplayer/domain/lobby_controller.dart';
 import 'package:wisdom_gre_app/features/auth/domain/auth_state_provider.dart';
+import 'package:wisdom_gre_app/features/multiplayer/presentation/arena_multiplayer_screen.dart';
 
 class MultiplayerLobbyScreen extends ConsumerStatefulWidget {
   const MultiplayerLobbyScreen({super.key});
@@ -78,6 +79,17 @@ class _MultiplayerLobbyScreenState extends ConsumerState<MultiplayerLobbyScreen>
             backgroundColor: Colors.red,
           ),
         );
+      } else {
+        final prevDuel = previous?.valueOrNull;
+        final nextDuel = next.valueOrNull;
+        if (prevDuel?.status == 'waiting' && nextDuel?.status == 'playing' && nextDuel != null) {
+          // Transition to Arena
+          if (context.mounted) {
+             Navigator.of(context).pushReplacement(
+               MaterialPageRoute(builder: (_) => ArenaMultiplayerScreen(duelId: nextDuel.id))
+             );
+          }
+        }
       }
     });
 
@@ -204,7 +216,7 @@ class _MultiplayerLobbyScreenState extends ConsumerState<MultiplayerLobbyScreen>
                       child: ElevatedButton(
                         onPressed: () {
                           HapticFeedback.vibrate();
-                          // Transition to match
+                          ref.read(lobbyControllerProvider.notifier).startBattle(duel.id);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.redAccent,
