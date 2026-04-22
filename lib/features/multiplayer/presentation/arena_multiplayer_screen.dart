@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -9,11 +10,20 @@ import 'package:wisdom_gre_app/core/theme/app_theme.dart';
 import 'package:wisdom_gre_app/features/multiplayer/domain/lobby_controller.dart';
 import 'package:wisdom_gre_app/features/multiplayer/domain/multiplayer_arena_controller.dart';
 import 'package:wisdom_gre_app/features/auth/domain/auth_state_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:wisdom_gre_app/features/multiplayer/presentation/arena_recap_screen.dart';
 
 class ArenaMultiplayerScreen extends ConsumerStatefulWidget {
   final String duelId;
+  final int? hostSelectedDuration;
+  final String? hostSelectedMode;
 
-  const ArenaMultiplayerScreen({super.key, required this.duelId});
+  const ArenaMultiplayerScreen({
+    super.key, 
+    required this.duelId, 
+    this.hostSelectedDuration,
+    this.hostSelectedMode,
+  });
 
   @override
   ConsumerState<ArenaMultiplayerScreen> createState() => _ArenaMultiplayerScreenState();
@@ -71,13 +81,69 @@ class _ArenaMultiplayerScreenState extends ConsumerState<ArenaMultiplayerScreen>
   void _endGame() {
       final lobbyState = ref.read(lobbyControllerProvider).valueOrNull;
       final me = ref.read(currentUserProvider);
+      final arenaState = ref.read(multiplayerArenaControllerProvider(widget.duelId));
       
       // Stop the controller
       _timerController.stop();
 
-      // Only host updates SQL to avoid spam
+      // Force local transition IMMEDIATELY regardless of SQL success (resilience)
+      if (mounted) {
+         Navigator.of(context).pushReplacement(MaterialPageRoute(
+           builder: (_) => ArenaRecapScreen(
+             finalScores: arenaState.scores,
+             participants: lobbyState?.participants ?? [],
+           ),
+         ));
+      }
+
+      // Only host cleans up SQL and handles stats
       if (lobbyState != null && me != null && lobbyState.hostId == me.id) {
          Supabase.instance.client.from('duels').update({'status': 'finished'}).eq('id', widget.duelId);
+         
+         // Phase 7: Stats calculation (Tie Handling)
+         final scoresMap = arenaState.scores;
+         if (scoresMap.isNotEmpty && lobbyState.participants.length > 1) {
+            // Sort by score
+            final sortedEntries = scoresMap.entries.toList()
+              ..sort((a, b) => b.value.compareTo(a.value)); // Max first
+            
+            final topScore = sortedEntries.first.value;
+            final topPlayers = sortedEntries.where((e) => e.value == topScore).map((e) => e.key).toList();
+            final otherPlayers = sortedEntries.where((e) => e.value < topScore).map((e) => e.key).toList();
+            
+            // If absolute winner (only 1 player at the top)
+            if (topPlayers.length == 1) {
+               final winnerId = topPlayers.first;
+               if (otherPlayers.isNotEmpty) {
+                 Supabase.instance.client.rpc('record_match_results', params: {
+                    'winner_id': winnerId,
+                    'loser_ids': otherPlayers,
+                 });
+               }
+            } else {
+               // Tie at the top! No winner, but everyone else gets a loss.
+               // (Actually, if there are losers, they get a loss)
+               if (otherPlayers.isNotEmpty) {
+                  // Since record_match_results expects a winner, and we don't have one,
+                  // we can either modify the RPC to accept null winner, or just 
+                  // do an update directly for the losers if there's no winner.
+                  // For simplicity, let's call a direct update or a new RPC.
+                  // Or we can just call record_match_results with a dummy winner that won't match,
+                  // but that's dirty. Let's do a direct update. Or we can just let the Host update them
+                  // Wait, RLS prevents Host from updating others.
+                  // I should call record_match_results with a NULL winner_id. Let's pass a dummy UUID that no one has
+                  // or just let the RPC handle it if we modify it.
+                  // ACTUALLY, if the user ran the RPC exactly as I gave:
+                  // UPDATE ... WHERE id = winner_id.
+                  // If we pass an empty UUID like '00000000-0000-0000-0000-000000000000', it just updates nothing for the winner,
+                  // but updates the losers!
+                  Supabase.instance.client.rpc('record_match_results', params: {
+                    'winner_id': '00000000-0000-0000-0000-000000000000',
+                    'loser_ids': otherPlayers,
+                  });
+               }
+            }
+         }
       }
   }
 
@@ -103,12 +169,23 @@ class _ArenaMultiplayerScreenState extends ConsumerState<ArenaMultiplayerScreen>
   }
 
   void _generateAndBroadcastSeed(Map<String, dynamic> db) {
-    // Give time to all clients to establish the websocket connection
-    Future.delayed(const Duration(milliseconds: 1500), () {
-       final words = db.keys.toList();
-       words.shuffle();
-       final seed = words.take(20).toList(); // 20 questions
-       ref.read(multiplayerArenaControllerProvider(widget.duelId).notifier).broadcastSeed(seed);
+    final words = db.keys.toList();
+    words.shuffle();
+    final seed = words.take(100).toList(); // Mega-Seed
+    final duration = widget.hostSelectedDuration ?? 60;
+    final mode = widget.hostSelectedMode ?? 'def_to_word';
+    
+    // BEACON MODE: The Host blasts the Configuration periodically 
+    // to ensure opponents who transition late (or have high latency)
+    // catch the seed successfully and do not get stuck on 'Receiving scenario'
+    int ticks = 0;
+    Timer.periodic(const Duration(seconds: 2), (timer) {
+       if (!mounted || ticks >= 5) {
+          timer.cancel();
+          return;
+       }
+       ref.read(multiplayerArenaControllerProvider(widget.duelId).notifier).broadcastSeed(seed, duration, mode);
+       ticks++;
     });
   }
 
@@ -121,7 +198,7 @@ class _ArenaMultiplayerScreenState extends ConsumerState<ArenaMultiplayerScreen>
   }
 
   void _submitAnswer(String selectedOption, String correctWord) {
-    if (_hasAnsweredCurrent) return;
+    if (_hasAnsweredCurrent || _secondsLeft <= 0) return;
     
     setState(() {
        _hasAnsweredCurrent = true;
@@ -174,18 +251,8 @@ class _ArenaMultiplayerScreenState extends ConsumerState<ArenaMultiplayerScreen>
 
     ref.listen(multiplayerArenaControllerProvider(widget.duelId), (prev, next) {
        if ((prev == null || prev.seed.isEmpty) && next.seed.isNotEmpty) {
+          if (mounted) setState(() { _secondsLeft = next.duration; });
           _startGameTimer();
-       }
-    });
-    
-    ref.listen(lobbyControllerProvider, (prev, next) {
-       if (next.valueOrNull?.status == 'finished') {
-          if (context.mounted) {
-             // Future recap transition
-             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('BATTLE FINISHED! Transitioning...')));
-             Navigator.of(context).pop();
-             // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => ArenaRecapScreen()));
-          }
        }
     });
 
@@ -277,10 +344,11 @@ class _ArenaMultiplayerScreenState extends ConsumerState<ArenaMultiplayerScreen>
                            child: Text(
                               "$name found '${log.word}' !",
                               style: TextStyle(
-                                 color: Colors.white.withValues(alpha: 0.6),
-                                 fontSize: 12,
-                                 fontWeight: FontWeight.w500,
-                                 fontStyle: FontStyle.italic
+                                 color: neonAccent,
+                                 fontSize: 13,
+                                 fontWeight: FontWeight.w600,
+                                 fontStyle: FontStyle.italic,
+                                 shadows: const [Shadow(color: Colors.black87, blurRadius: 4, offset: Offset(1, 1))]
                               ),
                            ),
                          );
@@ -365,6 +433,9 @@ class _ArenaMultiplayerScreenState extends ConsumerState<ArenaMultiplayerScreen>
         _generateOptionsForCurrentWord(targetWord);
      }
 
+     final isWordToDef = state.mode == 'word_to_def';
+     final questionText = isWordToDef ? targetWord : (node['definition_en'] ?? "No definition found.");
+
      return PhysicalModel(
         color: surfaceColor,
         elevation: 8,
@@ -387,11 +458,11 @@ class _ArenaMultiplayerScreenState extends ConsumerState<ArenaMultiplayerScreen>
                     child: Center(
                        child: SingleChildScrollView(
                          child: Text(
-                            node['definition_en'] ?? "No definition found.",
+                            isWordToDef ? questionText.toUpperCase() : questionText,
                             textAlign: TextAlign.center,
                             style: GoogleFonts.outfit(
                                color: textColor,
-                               fontSize: 22,
+                               fontSize: isWordToDef ? 36 : 22,
                                fontWeight: FontWeight.w600,
                             ),
                          ),
@@ -402,6 +473,11 @@ class _ArenaMultiplayerScreenState extends ConsumerState<ArenaMultiplayerScreen>
                  ..._currentOptions.map((option) {
                     final isCorrect = option == targetWord;
                     final showFeedback = _hasAnsweredCurrent;
+                    
+                    String buttonText = option;
+                    if (isWordToDef) {
+                        buttonText = _fullDatabase![option]?['definition_en'] ?? option;
+                    }
                     
                     Color btnColor = surfaceColor;
                     Color btnText = textColor;
@@ -429,12 +505,19 @@ class _ArenaMultiplayerScreenState extends ConsumerState<ArenaMultiplayerScreen>
                               borderRadius: BorderRadius.circular(16)
                            ),
                            child: Center(
-                             child: Text(
-                               option.toUpperCase(),
-                               style: GoogleFonts.inter(
-                                  color: btnText,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 2
+                             child: Padding(
+                               padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                               child: Text(
+                                 isWordToDef ? buttonText : buttonText.toUpperCase(),
+                                 textAlign: TextAlign.center,
+                                 maxLines: isWordToDef ? 3 : 1,
+                                 overflow: TextOverflow.ellipsis,
+                                 style: GoogleFonts.inter(
+                                    color: btnText,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: isWordToDef ? 13 : 16,
+                                    letterSpacing: isWordToDef ? 0 : 2,
+                                 ),
                                ),
                              ),
                            ),

@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Profile {
 
- String get id; String get username;@JsonKey(name: 'first_name') String? get firstName;@JsonKey(name: 'last_name') String? get lastName; String? get email;@JsonKey(name: 'avatar_url') String? get avatarUrl;
+ String get id; String get username;@JsonKey(name: 'first_name') String? get firstName;@JsonKey(name: 'last_name') String? get lastName; String? get email;@JsonKey(name: 'avatar_url') String? get avatarUrl;@JsonKey(name: 'arena_wins') int? get arenaWins;@JsonKey(name: 'arena_losses') int? get arenaLosses;@JsonKey(name: 'current_streak') int? get currentStreak;
 /// Create a copy of Profile
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $ProfileCopyWith<Profile> get copyWith => _$ProfileCopyWithImpl<Profile>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Profile&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.email, email) || other.email == email)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Profile&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.email, email) || other.email == email)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl)&&(identical(other.arenaWins, arenaWins) || other.arenaWins == arenaWins)&&(identical(other.arenaLosses, arenaLosses) || other.arenaLosses == arenaLosses)&&(identical(other.currentStreak, currentStreak) || other.currentStreak == currentStreak));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,username,firstName,lastName,email,avatarUrl);
+int get hashCode => Object.hash(runtimeType,id,username,firstName,lastName,email,avatarUrl,arenaWins,arenaLosses,currentStreak);
 
 @override
 String toString() {
-  return 'Profile(id: $id, username: $username, firstName: $firstName, lastName: $lastName, email: $email, avatarUrl: $avatarUrl)';
+  return 'Profile(id: $id, username: $username, firstName: $firstName, lastName: $lastName, email: $email, avatarUrl: $avatarUrl, arenaWins: $arenaWins, arenaLosses: $arenaLosses, currentStreak: $currentStreak)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $ProfileCopyWith<$Res>  {
   factory $ProfileCopyWith(Profile value, $Res Function(Profile) _then) = _$ProfileCopyWithImpl;
 @useResult
 $Res call({
- String id, String username,@JsonKey(name: 'first_name') String? firstName,@JsonKey(name: 'last_name') String? lastName, String? email,@JsonKey(name: 'avatar_url') String? avatarUrl
+ String id, String username,@JsonKey(name: 'first_name') String? firstName,@JsonKey(name: 'last_name') String? lastName, String? email,@JsonKey(name: 'avatar_url') String? avatarUrl,@JsonKey(name: 'arena_wins') int? arenaWins,@JsonKey(name: 'arena_losses') int? arenaLosses,@JsonKey(name: 'current_streak') int? currentStreak
 });
 
 
@@ -65,7 +65,7 @@ class _$ProfileCopyWithImpl<$Res>
 
 /// Create a copy of Profile
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? username = null,Object? firstName = freezed,Object? lastName = freezed,Object? email = freezed,Object? avatarUrl = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? username = null,Object? firstName = freezed,Object? lastName = freezed,Object? email = freezed,Object? avatarUrl = freezed,Object? arenaWins = freezed,Object? arenaLosses = freezed,Object? currentStreak = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
@@ -73,7 +73,10 @@ as String,firstName: freezed == firstName ? _self.firstName : firstName // ignor
 as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String?,avatarUrl: freezed == avatarUrl ? _self.avatarUrl : avatarUrl // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,arenaWins: freezed == arenaWins ? _self.arenaWins : arenaWins // ignore: cast_nullable_to_non_nullable
+as int?,arenaLosses: freezed == arenaLosses ? _self.arenaLosses : arenaLosses // ignore: cast_nullable_to_non_nullable
+as int?,currentStreak: freezed == currentStreak ? _self.currentStreak : currentStreak // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -158,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String username, @JsonKey(name: 'first_name')  String? firstName, @JsonKey(name: 'last_name')  String? lastName,  String? email, @JsonKey(name: 'avatar_url')  String? avatarUrl)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String username, @JsonKey(name: 'first_name')  String? firstName, @JsonKey(name: 'last_name')  String? lastName,  String? email, @JsonKey(name: 'avatar_url')  String? avatarUrl, @JsonKey(name: 'arena_wins')  int? arenaWins, @JsonKey(name: 'arena_losses')  int? arenaLosses, @JsonKey(name: 'current_streak')  int? currentStreak)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Profile() when $default != null:
-return $default(_that.id,_that.username,_that.firstName,_that.lastName,_that.email,_that.avatarUrl);case _:
+return $default(_that.id,_that.username,_that.firstName,_that.lastName,_that.email,_that.avatarUrl,_that.arenaWins,_that.arenaLosses,_that.currentStreak);case _:
   return orElse();
 
 }
@@ -179,10 +182,10 @@ return $default(_that.id,_that.username,_that.firstName,_that.lastName,_that.ema
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String username, @JsonKey(name: 'first_name')  String? firstName, @JsonKey(name: 'last_name')  String? lastName,  String? email, @JsonKey(name: 'avatar_url')  String? avatarUrl)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String username, @JsonKey(name: 'first_name')  String? firstName, @JsonKey(name: 'last_name')  String? lastName,  String? email, @JsonKey(name: 'avatar_url')  String? avatarUrl, @JsonKey(name: 'arena_wins')  int? arenaWins, @JsonKey(name: 'arena_losses')  int? arenaLosses, @JsonKey(name: 'current_streak')  int? currentStreak)  $default,) {final _that = this;
 switch (_that) {
 case _Profile():
-return $default(_that.id,_that.username,_that.firstName,_that.lastName,_that.email,_that.avatarUrl);case _:
+return $default(_that.id,_that.username,_that.firstName,_that.lastName,_that.email,_that.avatarUrl,_that.arenaWins,_that.arenaLosses,_that.currentStreak);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +202,10 @@ return $default(_that.id,_that.username,_that.firstName,_that.lastName,_that.ema
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String username, @JsonKey(name: 'first_name')  String? firstName, @JsonKey(name: 'last_name')  String? lastName,  String? email, @JsonKey(name: 'avatar_url')  String? avatarUrl)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String username, @JsonKey(name: 'first_name')  String? firstName, @JsonKey(name: 'last_name')  String? lastName,  String? email, @JsonKey(name: 'avatar_url')  String? avatarUrl, @JsonKey(name: 'arena_wins')  int? arenaWins, @JsonKey(name: 'arena_losses')  int? arenaLosses, @JsonKey(name: 'current_streak')  int? currentStreak)?  $default,) {final _that = this;
 switch (_that) {
 case _Profile() when $default != null:
-return $default(_that.id,_that.username,_that.firstName,_that.lastName,_that.email,_that.avatarUrl);case _:
+return $default(_that.id,_that.username,_that.firstName,_that.lastName,_that.email,_that.avatarUrl,_that.arenaWins,_that.arenaLosses,_that.currentStreak);case _:
   return null;
 
 }
@@ -214,7 +217,7 @@ return $default(_that.id,_that.username,_that.firstName,_that.lastName,_that.ema
 @JsonSerializable()
 
 class _Profile implements Profile {
-  const _Profile({required this.id, required this.username, @JsonKey(name: 'first_name') this.firstName, @JsonKey(name: 'last_name') this.lastName, this.email, @JsonKey(name: 'avatar_url') this.avatarUrl});
+  const _Profile({required this.id, required this.username, @JsonKey(name: 'first_name') this.firstName, @JsonKey(name: 'last_name') this.lastName, this.email, @JsonKey(name: 'avatar_url') this.avatarUrl, @JsonKey(name: 'arena_wins') this.arenaWins, @JsonKey(name: 'arena_losses') this.arenaLosses, @JsonKey(name: 'current_streak') this.currentStreak});
   factory _Profile.fromJson(Map<String, dynamic> json) => _$ProfileFromJson(json);
 
 @override final  String id;
@@ -223,6 +226,9 @@ class _Profile implements Profile {
 @override@JsonKey(name: 'last_name') final  String? lastName;
 @override final  String? email;
 @override@JsonKey(name: 'avatar_url') final  String? avatarUrl;
+@override@JsonKey(name: 'arena_wins') final  int? arenaWins;
+@override@JsonKey(name: 'arena_losses') final  int? arenaLosses;
+@override@JsonKey(name: 'current_streak') final  int? currentStreak;
 
 /// Create a copy of Profile
 /// with the given fields replaced by the non-null parameter values.
@@ -237,16 +243,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Profile&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.email, email) || other.email == email)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Profile&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.email, email) || other.email == email)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl)&&(identical(other.arenaWins, arenaWins) || other.arenaWins == arenaWins)&&(identical(other.arenaLosses, arenaLosses) || other.arenaLosses == arenaLosses)&&(identical(other.currentStreak, currentStreak) || other.currentStreak == currentStreak));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,username,firstName,lastName,email,avatarUrl);
+int get hashCode => Object.hash(runtimeType,id,username,firstName,lastName,email,avatarUrl,arenaWins,arenaLosses,currentStreak);
 
 @override
 String toString() {
-  return 'Profile(id: $id, username: $username, firstName: $firstName, lastName: $lastName, email: $email, avatarUrl: $avatarUrl)';
+  return 'Profile(id: $id, username: $username, firstName: $firstName, lastName: $lastName, email: $email, avatarUrl: $avatarUrl, arenaWins: $arenaWins, arenaLosses: $arenaLosses, currentStreak: $currentStreak)';
 }
 
 
@@ -257,7 +263,7 @@ abstract mixin class _$ProfileCopyWith<$Res> implements $ProfileCopyWith<$Res> {
   factory _$ProfileCopyWith(_Profile value, $Res Function(_Profile) _then) = __$ProfileCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String username,@JsonKey(name: 'first_name') String? firstName,@JsonKey(name: 'last_name') String? lastName, String? email,@JsonKey(name: 'avatar_url') String? avatarUrl
+ String id, String username,@JsonKey(name: 'first_name') String? firstName,@JsonKey(name: 'last_name') String? lastName, String? email,@JsonKey(name: 'avatar_url') String? avatarUrl,@JsonKey(name: 'arena_wins') int? arenaWins,@JsonKey(name: 'arena_losses') int? arenaLosses,@JsonKey(name: 'current_streak') int? currentStreak
 });
 
 
@@ -274,7 +280,7 @@ class __$ProfileCopyWithImpl<$Res>
 
 /// Create a copy of Profile
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? username = null,Object? firstName = freezed,Object? lastName = freezed,Object? email = freezed,Object? avatarUrl = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? username = null,Object? firstName = freezed,Object? lastName = freezed,Object? email = freezed,Object? avatarUrl = freezed,Object? arenaWins = freezed,Object? arenaLosses = freezed,Object? currentStreak = freezed,}) {
   return _then(_Profile(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
@@ -282,7 +288,10 @@ as String,firstName: freezed == firstName ? _self.firstName : firstName // ignor
 as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String?,avatarUrl: freezed == avatarUrl ? _self.avatarUrl : avatarUrl // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,arenaWins: freezed == arenaWins ? _self.arenaWins : arenaWins // ignore: cast_nullable_to_non_nullable
+as int?,arenaLosses: freezed == arenaLosses ? _self.arenaLosses : arenaLosses // ignore: cast_nullable_to_non_nullable
+as int?,currentStreak: freezed == currentStreak ? _self.currentStreak : currentStreak // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 

@@ -4,6 +4,8 @@ import 'package:wisdom_gre_app/features/vocabulary/domain/providers/vocabulary_p
 import 'package:wisdom_gre_app/features/vocabulary/data/models/gre_word.dart';
 import 'package:wisdom_gre_app/features/vocabulary/data/models/practice_questions.dart';
 import 'package:wisdom_gre_app/features/flashcards/domain/review_session_provider.dart';
+import 'package:wisdom_gre_app/features/flashcards/domain/srs_helper.dart';
+import 'package:wisdom_gre_app/features/flashcards/data/models/word_progress.dart';
 import 'arena_state.dart';
 
 part 'arena_controller.g.dart';
@@ -48,25 +50,11 @@ class ArenaController extends _$ArenaController {
     if (specificWords != null && specificWords.isNotEmpty && state.mode == ArenaMode.dailyFocus) {
       wordsSource = specificWords;
     } else if (state.mode == ArenaMode.dailyFocus) {
-      // Find words reviewed today directly from the state
+      // Use the actual Daily Queue words!
       try {
-        final progressMap = await ref.read(wordProgressRepositoryProvider.future);
-        final allWords = ref.read(vocabularyProvider).valueOrNull ?? [];
-        final now = DateTime.now();
-        final todayMidnight = DateTime(now.year, now.month, now.day);
-        
-        wordsSource = allWords.where((w) {
-          final prog = progressMap[w.originalInput];
-          if (prog?.lastReviewDate != null) {
-            final lrDate = DateTime(prog!.lastReviewDate!.year, prog.lastReviewDate!.month, prog.lastReviewDate!.day);
-            return lrDate.isAtSameMomentAs(todayMidnight);
-          }
-          return false;
-        }).toList();
-        
-        // Fallback to marathon if empty
+        wordsSource = await ref.read(dailyWordsListProvider.future);
         if (wordsSource.isEmpty) {
-           wordsSource = allWords;
+           wordsSource = ref.read(vocabularyProvider).valueOrNull ?? [];
         }
       } catch (e) {
         wordsSource = ref.read(vocabularyProvider).valueOrNull ?? [];
@@ -188,6 +176,27 @@ class ArenaController extends _$ArenaController {
         streakMultiplier: newStreak,
         userAnswers: updatedMap,
       );
+
+      // --- SRS Integration ---
+      // If the answer is correct in the Arena, give it a small progression bump (ReviewGrade.hard)
+      // because Arena is recognition, not active recall.
+      try {
+        final currentQuestion = state.questions[state.currentIndex];
+        final wordId = currentQuestion.word.originalInput;
+        
+        final progressRepo = ref.read(wordProgressRepositoryProvider.notifier);
+        final currentProgress = ref.read(wordProgressRepositoryProvider).valueOrNull?[wordId];
+        
+        final newProgress = SRSHelper.calculateNextReview(
+          currentProgress ?? WordProgress(wordId: wordId, nextReviewDate: DateTime.now()), 
+          ReviewGrade.hard,
+        );
+        
+        progressRepo.saveProgress(newProgress);
+      } catch (e) {
+        // Silently fail if progress repository throws (e.g. during rapid unmount)
+      }
+      
     } else {
       state = state.copyWith(
         streakMultiplier: 1,

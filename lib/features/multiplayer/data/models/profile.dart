@@ -12,6 +12,9 @@ abstract class Profile with _$Profile {
     @JsonKey(name: 'last_name') String? lastName,
     String? email,
     @JsonKey(name: 'avatar_url') String? avatarUrl,
+    @JsonKey(name: 'arena_wins') int? arenaWins,
+    @JsonKey(name: 'arena_losses') int? arenaLosses,
+    @JsonKey(name: 'current_streak') int? currentStreak,
   }) = _Profile;
 
   factory Profile.fromJson(Map<String, dynamic> json) => _$ProfileFromJson(json);

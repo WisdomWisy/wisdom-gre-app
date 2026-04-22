@@ -1,16 +1,31 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 part 'exam_goal_provider.g.dart';
 
 @riverpod
 class ExamDate extends _$ExamDate {
+  static const _key = 'exam_date_pref';
+
   @override
   DateTime? build() {
-    return null; // Initial state: no date selected
+    _loadDate();
+    return null; // Initial state while loading
   }
 
-  void setDate(DateTime date) {
+  Future<void> _loadDate() async {
+    final prefs = await SharedPreferences.getInstance();
+    final dateStr = prefs.getString(_key);
+    if (dateStr != null) {
+      state = DateTime.tryParse(dateStr);
+    }
+  }
+
+  Future<void> setDate(DateTime date) async {
     state = date;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_key, date.toIso8601String());
   }
 }
 

@@ -13,6 +13,9 @@ _Profile _$ProfileFromJson(Map<String, dynamic> json) => _Profile(
   lastName: json['last_name'] as String?,
   email: json['email'] as String?,
   avatarUrl: json['avatar_url'] as String?,
+  arenaWins: (json['arena_wins'] as num?)?.toInt(),
+  arenaLosses: (json['arena_losses'] as num?)?.toInt(),
+  currentStreak: (json['current_streak'] as num?)?.toInt(),
 );
 
 Map<String, dynamic> _$ProfileToJson(_Profile instance) => <String, dynamic>{
@@ -22,4 +25,7 @@ Map<String, dynamic> _$ProfileToJson(_Profile instance) => <String, dynamic>{
   'last_name': instance.lastName,
   'email': instance.email,
   'avatar_url': instance.avatarUrl,
+  'arena_wins': instance.arenaWins,
+  'arena_losses': instance.arenaLosses,
+  'current_streak': instance.currentStreak,
 };

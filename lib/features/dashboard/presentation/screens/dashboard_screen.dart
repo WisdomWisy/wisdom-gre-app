@@ -13,6 +13,7 @@ import 'package:wisdom_gre_app/features/arena/presentation/screens/arena_screen.
 import 'package:wisdom_gre_app/features/multiplayer/presentation/multiplayer_lobby_screen.dart';
 import 'package:wisdom_gre_app/features/multiplayer/presentation/matchmaking_hub_screen.dart';
 import 'package:wisdom_gre_app/features/auth/domain/auth_state_provider.dart';
+import 'package:wisdom_gre_app/features/dashboard/presentation/profile_stats_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -37,6 +38,15 @@ class DashboardScreen extends ConsumerWidget {
                 Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  IconButton(
+                    icon: Icon(Icons.bar_chart_rounded, color: themeData.textColor, size: 28),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const ProfileStatsScreen()),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 8),
                   IconButton(
                     icon: Icon(Icons.settings, color: themeData.textColor, size: 28),
                     onPressed: () {
@@ -81,23 +91,30 @@ class DashboardScreen extends ConsumerWidget {
                 data: (words) {
                   final dailyGoalValue = ref.watch(dailyGoalProvider(totalWords: words.length));
                   
-                  return Container(
-                    padding: const EdgeInsets.all(28),
-                    decoration: BoxDecoration(
-                      color: themeData.surfaceColor.withValues(alpha: 0.85),
-                      borderRadius: BorderRadius.circular(32),
-                      border: Border.all(
-                        color: themeData.textColor.withValues(alpha: 0.1),
-                        width: 1.5,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: themeData.textColor.withValues(alpha: 0.08),
-                          blurRadius: 30,
-                          offset: const Offset(0, 15),
+                    return Container(
+                      padding: const EdgeInsets.all(28),
+                      decoration: BoxDecoration(
+                        color: themeData.surfaceColor,
+                        borderRadius: BorderRadius.circular(32),
+                        border: Border.all(
+                          color: themeData.isDarkMode ? themeData.textColor.withValues(alpha: 0.1) : Colors.transparent,
+                          width: 1.5,
                         ),
-                      ],
-                    ),
+                        boxShadow: [
+                          if (!themeData.isDarkMode)
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            )
+                          else
+                            BoxShadow(
+                              color: themeData.textColor.withValues(alpha: 0.08),
+                              blurRadius: 30,
+                              offset: const Offset(0, 15),
+                            ),
+                        ],
+                      ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -221,10 +238,17 @@ class DashboardScreen extends ConsumerWidget {
                           const SizedBox(height: 16),
                           OutlinedButton.icon(
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: themeData.textColor,
-                              side: BorderSide(color: themeData.textColor.withValues(alpha: 0.3), width: 2),
+                              foregroundColor: themeData.isDarkMode ? Colors.white : const Color(0xFF111827),
+                              side: BorderSide(
+                                color: themeData.isDarkMode 
+                                  ? Colors.white.withValues(alpha: 0.3) 
+                                  : const Color(0xFF111827).withValues(alpha: 0.3), 
+                                width: 2
+                              ),
                               padding: const EdgeInsets.symmetric(vertical: 18),
-                              backgroundColor: themeData.surfaceColor.withValues(alpha: 0.5),
+                              backgroundColor: themeData.isDarkMode 
+                                ? themeData.surfaceColor.withValues(alpha: 0.5) 
+                                : Colors.transparent,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
@@ -234,22 +258,23 @@ class DashboardScreen extends ConsumerWidget {
                                 MaterialPageRoute(builder: (_) => const PodcastScreen()),
                               );
                             },
-                            icon: Icon(Icons.headphones_rounded, color: themeData.textColor),
-                            label: const Text(
+                            icon: Icon(Icons.headphones_rounded, color: themeData.isDarkMode ? Colors.white : const Color(0xFF111827)),
+                            label: Text(
                               'Listen to Podcast',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
+                                color: themeData.isDarkMode ? Colors.white : const Color(0xFF111827),
                               ),
                             ),
                           ),
                           const SizedBox(height: 16),
                           OutlinedButton.icon(
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.amber[400],
-                              side: BorderSide(color: Colors.amber[400]!.withValues(alpha: 0.5), width: 2),
+                              foregroundColor: themeData.isDarkMode ? Colors.amber[400] : Colors.amber[800],
+                              side: BorderSide(color: (themeData.isDarkMode ? Colors.amber[400]! : Colors.amber[800]!).withValues(alpha: 0.5), width: 2),
                               padding: const EdgeInsets.symmetric(vertical: 18),
-                              backgroundColor: Colors.amber[800]!.withValues(alpha: 0.1),
+                              backgroundColor: (themeData.isDarkMode ? Colors.amber[800]! : Colors.amber[600]!).withValues(alpha: 0.1),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
@@ -282,10 +307,10 @@ class DashboardScreen extends ConsumerWidget {
                           const SizedBox(height: 16),
                           OutlinedButton.icon(
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: const Color(0xFF00FFCC),
-                              side: BorderSide(color: const Color(0xFF00FFCC).withValues(alpha: 0.5), width: 2),
+                              foregroundColor: themeData.isDarkMode ? const Color(0xFF00FFCC) : const Color(0xFF007A66),
+                              side: BorderSide(color: (themeData.isDarkMode ? const Color(0xFF00FFCC) : const Color(0xFF007A66)).withValues(alpha: 0.5), width: 2),
                               padding: const EdgeInsets.symmetric(vertical: 18),
-                              backgroundColor: const Color(0xFF00FFCC).withValues(alpha: 0.05),
+                              backgroundColor: (themeData.isDarkMode ? const Color(0xFF00FFCC) : const Color(0xFF007A66)).withValues(alpha: 0.05),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),

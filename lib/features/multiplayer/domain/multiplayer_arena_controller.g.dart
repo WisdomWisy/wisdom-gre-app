@@ -7,7 +7,7 @@ part of 'multiplayer_arena_controller.dart';
 // **************************************************************************
 
 String _$multiplayerArenaControllerHash() =>
-    r'86047ef86153ed7990e314b01fcb76a0ef8eaf73';
+    r'96d91e23adef4b2818a6eb1c4f8ead4a7a2ac336';
 
 /// Copied from Dart SDK
 class _SystemHash {

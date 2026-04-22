@@ -236,9 +236,15 @@ class LobbyController extends _$LobbyController {
             .from('duels')
             .update({'status': 'playing'})
             .eq('id', duelId);
+            
+        // Optimistically update the state so the UI listener fires immediately 
+        // without waiting for Postgres replication lag.
+        final updatedDuel = currentDuel.copyWith(status: 'playing');
+        state = AsyncData(updatedDuel);
       }
-    } catch (e) {
-      // Ignored for broadcast UI logic simplicity
+    } catch (e, stack) {
+      print("START BATTLE ERROR: $e");
+      state = AsyncError(e, stack);
     }
   }
 

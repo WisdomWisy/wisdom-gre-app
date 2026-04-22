@@ -10,6 +10,7 @@ import 'package:wisdom_gre_app/core/theme/app_theme.dart';
 import 'package:wisdom_gre_app/features/multiplayer/domain/lobby_controller.dart';
 import 'package:wisdom_gre_app/features/auth/domain/auth_state_provider.dart';
 import 'package:wisdom_gre_app/features/multiplayer/presentation/arena_multiplayer_screen.dart';
+import 'package:wisdom_gre_app/features/dashboard/presentation/profile_stats_screen.dart';
 
 class MultiplayerLobbyScreen extends ConsumerStatefulWidget {
   const MultiplayerLobbyScreen({super.key});
@@ -21,6 +22,8 @@ class MultiplayerLobbyScreen extends ConsumerStatefulWidget {
 class _MultiplayerLobbyScreenState extends ConsumerState<MultiplayerLobbyScreen> with SingleTickerProviderStateMixin {
   bool _isJoining = false;
   final _joinCodeController = TextEditingController();
+  int _selectedDuration = 60;
+  String _selectedMode = 'def_to_word';
 
   void _createDuel() {
     HapticFeedback.heavyImpact();
@@ -75,26 +78,32 @@ class _MultiplayerLobbyScreenState extends ConsumerState<MultiplayerLobbyScreen>
       if (next.hasError) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(next.error.toString()),
+            content: Text('STATE ERROR: ${next.error}'),
             backgroundColor: Colors.red,
+            duration: const Duration(seconds: 10),
           ),
         );
       } else {
-        final prevDuel = previous?.valueOrNull;
         final nextDuel = next.valueOrNull;
-        if (prevDuel?.status == 'waiting' && nextDuel?.status == 'playing' && nextDuel != null) {
+        if (nextDuel?.status == 'playing' && nextDuel != null) {
           // Transition to Arena
           if (context.mounted) {
+             final me = ref.read(currentUserProvider);
+             final isHost = nextDuel.hostId == me?.id;
              Navigator.of(context).pushReplacement(
-               MaterialPageRoute(builder: (_) => ArenaMultiplayerScreen(duelId: nextDuel.id))
+               MaterialPageRoute(builder: (_) => ArenaMultiplayerScreen(
+                 duelId: nextDuel.id,
+                 hostSelectedDuration: isHost ? _selectedDuration : null,
+                 hostSelectedMode: isHost ? _selectedMode : null,
+               ))
              );
           }
         }
       }
     });
 
-    final currentUser = ref.watch(currentUserProvider);
-    final isHost = duel?.hostId == currentUser?.id;
+    final me = ref.watch(currentUserProvider);
+    final isHost = duel?.hostId == me?.id;
     final isLobbyFull = duel != null && duel.participants.length >= duel.maxPlayers;
 
     return Scaffold(
@@ -113,6 +122,17 @@ class _MultiplayerLobbyScreenState extends ConsumerState<MultiplayerLobbyScreen>
         ),
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.bar_chart_rounded),
+            color: neonAccent,
+            tooltip: 'Quantified Self',
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const ProfileStatsScreen()),
+              );
+            },
+          ),
           if (duel != null)
             IconButton(
               icon: Icon(isHost ? Icons.delete_forever : Icons.exit_to_app, color: Colors.redAccent),
@@ -171,7 +191,7 @@ class _MultiplayerLobbyScreenState extends ConsumerState<MultiplayerLobbyScreen>
                                   final participant = duel.participants[index];
                                   final profile = participant.profiles;
                                   final isParticipantHost = participant.userId == duel.hostId;
-                                  final isMe = participant.userId == currentUser?.id;
+                                  final isMe = participant.userId == me?.id;
                                   
                                   String finalName = 'User_${participant.userId.substring(0, 5)}';
                                   if (profile != null) {
@@ -205,6 +225,74 @@ class _MultiplayerLobbyScreenState extends ConsumerState<MultiplayerLobbyScreen>
                   ),
                 ),
                 
+                // Timer Selection for Host
+                if (isHost && duel!.participants.length > 1)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          "BATTLE DURATION",
+                          style: GoogleFonts.inter(
+                            color: goldAccent,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 2,
+                            fontSize: 12
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        SegmentedButton<int>(
+                          segments: const [
+                            ButtonSegment(value: 30, label: Text('30s SPRINT')),
+                            ButtonSegment(value: 60, label: Text('60s STANDARD')),
+                            ButtonSegment(value: 90, label: Text('90s MARATHON')),
+                          ],
+                          selected: {_selectedDuration},
+                          onSelectionChanged: (Set<int> newSelection) {
+                            setState(() {
+                              _selectedDuration = newSelection.first;
+                            });
+                          },
+                          style: SegmentedButton.styleFrom(
+                            backgroundColor: surfaceColor.withValues(alpha: 0.5),
+                            selectedForegroundColor: neonAccent,
+                            selectedBackgroundColor: neonAccent.withValues(alpha: 0.1),
+                            side: BorderSide(color: isDark ? Colors.white24 : Colors.black12),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          "GAME MODE",
+                          style: GoogleFonts.inter(
+                            color: goldAccent,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 2,
+                            fontSize: 12
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        SegmentedButton<String>(
+                          segments: const [
+                            ButtonSegment(value: 'def_to_word', label: Text('Find Word')),
+                            ButtonSegment(value: 'word_to_def', label: Text('Find Def')),
+                          ],
+                          selected: {_selectedMode},
+                          onSelectionChanged: (Set<String> newSelection) {
+                            setState(() {
+                              _selectedMode = newSelection.first;
+                            });
+                          },
+                          style: SegmentedButton.styleFrom(
+                            backgroundColor: surfaceColor.withValues(alpha: 0.5),
+                            selectedForegroundColor: neonAccent,
+                            selectedBackgroundColor: neonAccent.withValues(alpha: 0.1),
+                            side: BorderSide(color: isDark ? Colors.white24 : Colors.black12),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
                 // Bottom Ready Button
                 if (isHost && duel!.participants.length > 1)
                   Padding(
@@ -216,6 +304,9 @@ class _MultiplayerLobbyScreenState extends ConsumerState<MultiplayerLobbyScreen>
                       child: ElevatedButton(
                         onPressed: () {
                           HapticFeedback.vibrate();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                             const SnackBar(content: Text('Broadcasting Start Battle Signal...'), duration: Duration(seconds: 1))
+                          );
                           ref.read(lobbyControllerProvider.notifier).startBattle(duel.id);
                         },
                         style: ElevatedButton.styleFrom(

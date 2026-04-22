@@ -3,11 +3,15 @@ import 'package:wisdom_gre_app/features/arena/presentation/screens/arena_screen.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wisdom_gre_app/core/components/mesh_background.dart';
 import 'package:wisdom_gre_app/core/theme/app_theme.dart';
-import 'package:wisdom_gre_app/features/flashcards/domain/review_session_provider.dart';
 import 'package:wisdom_gre_app/features/flashcards/domain/srs_helper.dart';
 import 'package:wisdom_gre_app/features/flashcards/data/models/word_progress.dart';
 import 'package:wisdom_gre_app/features/flashcards/presentation/widgets/flashcard_widget.dart';
 import 'package:wisdom_gre_app/features/vocabulary/data/models/gre_word.dart';
+import 'package:wisdom_gre_app/features/flashcards/presentation/providers/flashcard_session_controller.dart';
+import 'package:wisdom_gre_app/features/flashcards/domain/review_session_provider.dart';
+import 'package:wisdom_gre_app/features/dashboard/domain/providers/exam_goal_provider.dart';
+import 'package:wisdom_gre_app/features/vocabulary/domain/providers/vocabulary_provider.dart';
+import 'dart:ui';
 
 class FlashcardScreen extends ConsumerStatefulWidget {
   const FlashcardScreen({Key? key}) : super(key: key);
@@ -25,26 +29,87 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen> {
     });
   }
 
-  void _rateWord(GreWord word, WordProgress? currentProgress, ReviewGrade grade) {
-    // Determine current state of progress or create a new one
-    final progress = currentProgress ?? WordProgress(wordId: word.originalInput, nextReviewDate: DateTime.now());
+  void _rateWord(GreWord word, ReviewGrade grade) {
+    ref.read(flashcardSessionControllerProvider.notifier).rateWord(grade);
     
-    // Calculate new progress via SRS algorithm
-    final newProgress = SRSHelper.calculateNextReview(progress, grade);
-
-    // Save to repository (this will invalidate the session and pop the queue)
-    ref.read(wordProgressRepositoryProvider.notifier).saveProgress(newProgress);
-    
-    // Reset state for the next card immediately for UI smoothness
     setState(() {
       _isFront = true;
     });
   }
 
+  void _showAnticipateDialog(AppThemeData theme) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: theme.surfaceColor.withOpacity(0.8),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                border: Border(top: BorderSide(color: theme.textColor.withOpacity(0.1))),
+              ),
+              child: SafeArea(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.psychology_alt, size: 48, color: Color(0xFFED8F03)),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Anticipation Mode',
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: theme.textColor),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Do you want to save this session in your Spaced Repetition learning curve?',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16, color: theme.textColor.withOpacity(0.8)),
+                    ),
+                    const SizedBox(height: 32),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFED8F03),
+                        minimumSize: const Size(double.infinity, 56),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        ref.read(flashcardSessionControllerProvider.notifier).startAnticipation(true);
+                      },
+                      child: const Text('Yes, track progress', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: theme.textColor,
+                        minimumSize: const Size(double.infinity, 56),
+                        side: BorderSide(color: theme.textColor.withOpacity(0.5)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        ref.read(flashcardSessionControllerProvider.notifier).startAnticipation(false);
+                      },
+                      child: Text('No, Ghost Mode', style: TextStyle(color: theme.textColor, fontSize: 18)),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeData = ref.watch(themeControllerProvider);
-    final sessionAsync = ref.watch(reviewSessionProvider);
+    final sessionAsync = ref.watch(flashcardSessionControllerProvider);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -52,6 +117,14 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: IconThemeData(color: themeData.textColor),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            // Force reset to SRS when leaving so it doesn't stay stuck in Ghost Mode forever
+            ref.read(flashcardSessionControllerProvider.notifier).resetToSrs();
+            Navigator.of(context).pop();
+          },
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.restart_alt, color: themeData.textColor),
@@ -75,6 +148,7 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen> {
                       style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
                       onPressed: () {
                         ref.read(wordProgressRepositoryProvider.notifier).resetAllProgress();
+                        ref.read(flashcardSessionControllerProvider.notifier).resetToSrs();
                         Navigator.pop(ctx);
                       },
                       child: const Text('Reset', style: TextStyle(color: Colors.white)),
@@ -95,66 +169,147 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen> {
               style: TextStyle(color: themeData.textColor),
             ),
           ),
-          data: (queue) {
+          data: (sessionState) {
+            final queue = sessionState.queue;
+
             if (queue.isEmpty) {
+              final totalWordsAsync = ref.watch(vocabularyProvider);
+              final totalWords = totalWordsAsync.valueOrNull?.length ?? 0;
+              final dailyGoal = ref.watch(dailyGoalProvider(totalWords: totalWords));
+
               return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.celebration, size: 80, color: themeData.textColor),
-                    const SizedBox(height: 24),
-                    Text(
-                      'You are all caught up!',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: themeData.textColor,
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.celebration, size: 80, color: themeData.textColor),
+                      const SizedBox(height: 24),
+                      Text(
+                        sessionState.mode == FlashcardSessionMode.srs 
+                            ? 'You are all caught up!' 
+                            : 'Session Complete!',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: themeData.textColor,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Come back tomorrow for more reviews.',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: themeData.textColor.withOpacity(0.8),
+                      const SizedBox(height: 8),
+                      Text(
+                        sessionState.mode == FlashcardSessionMode.srs 
+                            ? 'Come back tomorrow for more reviews.'
+                            : 'Want to keep going?',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: themeData.textColor.withOpacity(0.8),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 48),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => const ArenaScreen()));
-                      },
-                      icon: const Icon(Icons.shield, color: Colors.white),
-                      label: const Text(
-                        'Test your knowledge in the Arena!',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                      if (sessionState.mode == FlashcardSessionMode.srs) ...[
+                        const SizedBox(height: 32),
+                        OutlinedButton.icon(
+                          onPressed: () {
+                            _showAnticipateDialog(themeData);
+                          },
+                          icon: Icon(Icons.fast_forward, color: themeData.textColor),
+                          label: Text('Anticipate $dailyGoal words', style: TextStyle(color: themeData.textColor)),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: themeData.textColor.withOpacity(0.5)),
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        OutlinedButton.icon(
+                          onPressed: () {
+                            ref.read(flashcardSessionControllerProvider.notifier).startReviewAgain();
+                          },
+                          icon: Icon(Icons.history, color: themeData.textColor),
+                          label: Text('Review today\'s words again', style: TextStyle(color: themeData.textColor)),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: themeData.textColor.withOpacity(0.5)),
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          ),
+                        ),
+                      ],
+                      if (sessionState.mode != FlashcardSessionMode.srs) ...[
+                        const SizedBox(height: 32),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            ref.read(flashcardSessionControllerProvider.notifier).resetToSrs();
+                          },
+                          icon: const Icon(Icons.check, color: Colors.white),
+                          label: const Text('Finish Extra Study', style: TextStyle(color: Colors.white)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFED8F03),
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 48),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const ArenaScreen()));
+                        },
+                        icon: const Icon(Icons.shield, color: Colors.white),
+                        label: const Text(
+                          'Test your knowledge in the Arena!',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFED8F03),
+                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                          elevation: 10,
+                          shadowColor: const Color(0xFFED8F03).withOpacity(0.5),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        ),
                       ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFED8F03),
-                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                        elevation: 10,
-                        shadowColor: const Color(0xFFED8F03).withOpacity(0.5),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             }
 
             final currentWord = queue.first;
             
+            String modeBadge = '';
+            if (sessionState.mode == FlashcardSessionMode.anticipateGhost) modeBadge = 'GHOST MODE';
+            if (sessionState.mode == FlashcardSessionMode.anticipateTracked) modeBadge = 'ANTICIPATING (TRACKED)';
+            if (sessionState.mode == FlashcardSessionMode.reviewAgain) modeBadge = 'REVIEWING';
+
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
               child: Column(
                 children: [
                   // Progress Text
-                  Text(
-                    '${queue.length} words remaining',
-                    style: TextStyle(
-                      color: themeData.textColor.withOpacity(0.7),
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${queue.length} words remaining',
+                        style: TextStyle(
+                          color: themeData.textColor.withOpacity(0.7),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      if (modeBadge.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: sessionState.mode == FlashcardSessionMode.anticipateGhost ? Colors.grey.withOpacity(0.3) : const Color(0xFFED8F03).withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            modeBadge,
+                            style: TextStyle(
+                              color: sessionState.mode == FlashcardSessionMode.anticipateGhost ? Colors.grey : const Color(0xFFED8F03),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 24),
                   
@@ -204,10 +359,6 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen> {
     String label, 
     Color color
   ) {
-    // We safely watch the future so we easily access current progress
-    final progressMapAsync = ref.watch(wordProgressRepositoryProvider);
-    final currentProgress = progressMapAsync.valueOrNull?[word.originalInput];
-
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
          backgroundColor: color.withOpacity(0.2),
@@ -219,7 +370,7 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen> {
            side: BorderSide(color: color, width: 2),
          )
       ),
-      onPressed: () => _rateWord(word, currentProgress, grade),
+      onPressed: () => _rateWord(word, grade),
       child: Text(
         label,
         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),

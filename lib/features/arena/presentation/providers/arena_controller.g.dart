@@ -6,7 +6,7 @@ part of 'arena_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$arenaControllerHash() => r'2ffd3646274de26795322556d8e56880d8dc9ccb';
+String _$arenaControllerHash() => r'b40414841c5eb91c652e12a9713221619c69a562';
 
 /// See also [ArenaController].
 @ProviderFor(ArenaController)

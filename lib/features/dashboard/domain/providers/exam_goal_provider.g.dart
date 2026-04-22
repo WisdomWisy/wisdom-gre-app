@@ -142,7 +142,7 @@ class _DailyGoalProviderElement extends AutoDisposeProviderElement<int>
   int get totalWords => (origin as DailyGoalProvider).totalWords;
 }
 
-String _$examDateHash() => r'8f255206e552e96383daaa376549f283feec2d65';
+String _$examDateHash() => r'8d6057af7d36d5b4ff94beb11fbec92f272a6ac8';
 
 /// See also [ExamDate].
 @ProviderFor(ExamDate)

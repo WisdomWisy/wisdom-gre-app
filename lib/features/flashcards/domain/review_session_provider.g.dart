@@ -6,9 +6,9 @@ part of 'review_session_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$reviewSessionHash() => r'fefc6ac9b83c7b12b15c1e6c1fa20e07c958280d';
+String _$reviewSessionHash() => r'1e41f567f516dfca50a7162af554bded06f977d5';
 
-/// Represents the session queue for the day
+/// Represents the active session queue for the day (excluding already reviewed)
 ///
 /// Copied from [reviewSession].
 @ProviderFor(reviewSession)
@@ -26,6 +26,27 @@ final reviewSessionProvider = AutoDisposeFutureProvider<List<GreWord>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ReviewSessionRef = AutoDisposeFutureProviderRef<List<GreWord>>;
+String _$dailyWordsListHash() => r'5d28a0f7c9cfabe5f3e9fd64cd8dad7b9e3a5923';
+
+/// Represents the full daily list (including already reviewed)
+///
+/// Copied from [dailyWordsList].
+@ProviderFor(dailyWordsList)
+final dailyWordsListProvider =
+    AutoDisposeFutureProvider<List<GreWord>>.internal(
+      dailyWordsList,
+      name: r'dailyWordsListProvider',
+      debugGetCreateSourceHash:
+          const bool.fromEnvironment('dart.vm.product')
+              ? null
+              : _$dailyWordsListHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef DailyWordsListRef = AutoDisposeFutureProviderRef<List<GreWord>>;
 String _$wordProgressRepositoryHash() =>
     r'77e72e0c386a779d56676bfa2c848edfcc2495e7';
 
@@ -47,5 +68,22 @@ final wordProgressRepositoryProvider = AutoDisposeAsyncNotifierProvider<
 
 typedef _$WordProgressRepository =
     AutoDisposeAsyncNotifier<Map<String, WordProgress>>;
+String _$dailyQueueHash() => r'f3ec9afd763d332d9029167d76663dc7d032c227';
+
+/// See also [DailyQueue].
+@ProviderFor(DailyQueue)
+final dailyQueueProvider =
+    AutoDisposeAsyncNotifierProvider<DailyQueue, List<String>>.internal(
+      DailyQueue.new,
+      name: r'dailyQueueProvider',
+      debugGetCreateSourceHash:
+          const bool.fromEnvironment('dart.vm.product')
+              ? null
+              : _$dailyQueueHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$DailyQueue = AutoDisposeAsyncNotifier<List<String>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

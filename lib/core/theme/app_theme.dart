@@ -18,7 +18,6 @@ class AppThemeData {
     required this.isDarkMode,
   });
 
-  /// The first three colors are for the Mesh Gradient.
   List<Color> get gradientColors {
     if (isDarkMode) {
       if (type == ThemeType.purpleGold) {
@@ -37,26 +36,19 @@ class AppThemeData {
         ];
       }
     } else {
-      if (type == ThemeType.purpleGold) {
-        return [
-          const Color(0xFF8A2BE2), // Purple
-          const Color(0xFFE6E6FA), // Lavender
-          const Color(0xFFFFD700), // Gold
-          const Color(0xFFFFFFFF), // White
-        ];
-      } else {
-        return [
-          const Color(0xFFE0E0E0), // Light Silver
-          const Color(0xFFF5F5F5), // White-ish
-          const Color(0xFFBDBDBD), // Mid Silver
-          const Color(0xFF9E9E9E), // Darker Silver
-        ];
-      }
+      // Platinium Light Palette (for all ThemeTypes in light mode)
+      return [
+        const Color(0xFFF3F4F6), // Gris ultra-léger
+        const Color(0xFFE5E7EB),
+        const Color(0xFFF9FAFB),
+        const Color(0xFFD1D5DB),
+      ];
     }
   }
 
-  Color get textColor => isDarkMode ? Colors.white : Colors.black87;
-  Color get surfaceColor => isDarkMode ? Colors.black.withOpacity(0.5) : Colors.white.withOpacity(0.7);
+  Color get textColor => isDarkMode ? Colors.white : const Color(0xFF111827);
+  Color get surfaceColor => isDarkMode ? Colors.black.withOpacity(0.5) : const Color(0xFFFFFFFF);
+  Color get scaffoldBackgroundColor => isDarkMode ? const Color(0xFF121212) : const Color(0xFFF3F4F6);
 }
 
 @riverpod
