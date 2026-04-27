@@ -3,9 +3,11 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:wisdom_gre_app/features/vocabulary/domain/providers/vocabulary_provider.dart';
 import 'package:wisdom_gre_app/features/vocabulary/data/models/gre_word.dart';
 import 'package:wisdom_gre_app/features/vocabulary/data/models/practice_questions.dart';
-import 'package:wisdom_gre_app/features/flashcards/domain/review_session_provider.dart';
 import 'package:wisdom_gre_app/features/flashcards/domain/srs_helper.dart';
 import 'package:wisdom_gre_app/features/flashcards/data/models/word_progress.dart';
+import 'package:wisdom_gre_app/features/flashcards/domain/review_session_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:wisdom_gre_app/features/auth/domain/auth_state_provider.dart';
 import 'arena_state.dart';
 
 part 'arena_controller.g.dart';
@@ -67,6 +69,14 @@ class ArenaController extends _$ArenaController {
       state = state.copyWith(isLoading: false);
       return;
     }
+
+    // Track Solo Arena usage for Freemium limits
+    try {
+      final user = ref.read(currentUserProvider);
+      if (user != null) {
+        await Supabase.instance.client.rpc('increment_daily_duel', params: {'user_uuid': user.id});
+      }
+    } catch (_) {}
 
     List<ArenaQuestion> extractedQuestions = [];
     for (var word in wordsSource) {

@@ -5,6 +5,7 @@ import 'package:wisdom_gre_app/core/providers/language_provider.dart';
 import 'package:wisdom_gre_app/core/providers/tts_settings_provider.dart';
 import 'package:wisdom_gre_app/features/auth/domain/auth_state_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:wisdom_gre_app/features/subscriptions/domain/promo_code_service.dart';
 
 /// Application-wide settings dialog.
 ///
@@ -131,6 +132,12 @@ class SettingsDialog extends ConsumerWidget {
             onChanged: (val) =>
                 ref.read(ttsSpeechRateControllerProvider.notifier).setRate(val),
           ),
+
+          const Divider(height: 24),
+
+          // ── Subscriptions & Promos ───────────────────────────
+          _SectionHeader('Subscription', theme),
+          const _PromoCodeSection(),
 
           const Divider(height: 24),
 
@@ -301,4 +308,105 @@ class _EditProfileDialogState extends ConsumerState<EditProfileDialog> {
     );
   }
 }
+
+class _PromoCodeSection extends ConsumerStatefulWidget {
+  const _PromoCodeSection();
+
+  @override
+  ConsumerState<_PromoCodeSection> createState() => _PromoCodeSectionState();
+}
+
+class _PromoCodeSectionState extends ConsumerState<_PromoCodeSection> {
+  final _controller = TextEditingController();
+  bool _isLoading = false;
+
+  void _redeem() async {
+    final code = _controller.text;
+    if (code.isEmpty) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      await ref.read(promoCodeServiceProvider.notifier).redeemCode(code);
+      if (mounted) {
+        _controller.clear();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Promo code applied successfully! Premium unlocked.'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 4),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ref.watch(themeControllerProvider);
+    
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              style: TextStyle(color: theme.textColor),
+              textCapitalization: TextCapitalization.characters,
+              decoration: InputDecoration(
+                hintText: 'Have a promo code?',
+                hintStyle: TextStyle(color: theme.textColor.withValues(alpha: 0.4)),
+                isDense: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: theme.textColor.withValues(alpha: 0.2)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: theme.textColor.withValues(alpha: 0.2)),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          _isLoading
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : ElevatedButton(
+                  onPressed: _redeem,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFED8F03),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: const Text('Redeem', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+        ],
+      ),
+    );
+  }
+}
+
 

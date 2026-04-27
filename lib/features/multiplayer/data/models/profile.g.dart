@@ -16,6 +16,11 @@ _Profile _$ProfileFromJson(Map<String, dynamic> json) => _Profile(
   arenaWins: (json['arena_wins'] as num?)?.toInt(),
   arenaLosses: (json['arena_losses'] as num?)?.toInt(),
   currentStreak: (json['current_streak'] as num?)?.toInt(),
+  dailyDuelsCount: (json['daily_duels_count'] as num?)?.toInt() ?? 0,
+  lastDuelDate:
+      json['last_duel_date'] == null
+          ? null
+          : DateTime.parse(json['last_duel_date'] as String),
 );
 
 Map<String, dynamic> _$ProfileToJson(_Profile instance) => <String, dynamic>{
@@ -28,4 +33,6 @@ Map<String, dynamic> _$ProfileToJson(_Profile instance) => <String, dynamic>{
   'arena_wins': instance.arenaWins,
   'arena_losses': instance.arenaLosses,
   'current_streak': instance.currentStreak,
+  'daily_duels_count': instance.dailyDuelsCount,
+  'last_duel_date': instance.lastDuelDate?.toIso8601String(),
 };

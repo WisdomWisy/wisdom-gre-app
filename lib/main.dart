@@ -1,8 +1,10 @@
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:wisdom_gre_app/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:wisdom_gre_app/features/auth/presentation/auth_screen.dart';
 import 'package:wisdom_gre_app/features/auth/domain/auth_state_provider.dart';
@@ -23,7 +25,43 @@ void main() async {
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
+  await _initRevenueCat();
+
   runApp(const ProviderScope(child: WisdomGreApp()));
+}
+
+Future<void> _initRevenueCat() async {
+  await Purchases.setLogLevel(LogLevel.info);
+
+  PurchasesConfiguration? configuration;
+  if (Platform.isAndroid) {
+    configuration = PurchasesConfiguration(dotenv.env['REVENUECAT_GOOGLE_API_KEY'] ?? '');
+  } else if (Platform.isIOS) {
+    configuration = PurchasesConfiguration(dotenv.env['REVENUECAT_APPLE_API_KEY'] ?? '');
+  }
+  
+  if (configuration != null) {
+    await Purchases.configure(configuration);
+  }
+
+  // Listen to Auth State to automatically map Supabase User ID to RevenueCat
+  Supabase.instance.client.auth.onAuthStateChange.listen((data) async {
+    final session = data.session;
+    if (session != null) {
+      try {
+        await Purchases.logIn(session.user.id);
+      } catch (e) {
+        debugPrint('Error logging in to RevenueCat: $e');
+      }
+    } else {
+      try {
+        await Purchases.logOut();
+      } catch (e) {
+        // Ignorer l'erreur si l'utilisateur est déjà anonyme
+        debugPrint('RevenueCat logout info: $e');
+      }
+    }
+  });
 }
 
 class WisdomGreApp extends ConsumerWidget {

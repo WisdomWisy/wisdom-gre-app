@@ -22,7 +22,7 @@ final userLobbiesProvider = AutoDisposeStreamProvider<List<Duel>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef UserLobbiesRef = AutoDisposeStreamProviderRef<List<Duel>>;
-String _$lobbyControllerHash() => r'f91efe012b60301b21aa6dd2a1da1fe503780c1a';
+String _$lobbyControllerHash() => r'069e77249dd9c2ca3273dbbb07f0dc4820583795';
 
 /// See also [LobbyController].
 @ProviderFor(LobbyController)

@@ -5,6 +5,7 @@ import 'package:wisdom_gre_app/features/vocabulary/domain/providers/vocabulary_p
 import 'package:wisdom_gre_app/features/flashcards/data/models/word_progress.dart';
 import 'package:wisdom_gre_app/features/dashboard/domain/providers/exam_goal_provider.dart';
 import 'package:wisdom_gre_app/features/vocabulary/data/models/gre_word.dart';
+import 'package:wisdom_gre_app/features/subscriptions/domain/subscription_provider.dart';
 
 part 'review_session_provider.g.dart';
 
@@ -98,7 +99,8 @@ class DailyQueue extends _$DailyQueue {
       }
     }
 
-    final remainingGoal = (goal > 0 ? goal : 50) - reviewedTodayCount;
+    int remainingGoal = (goal > 0 ? goal : 50) - reviewedTodayCount;
+
     if (remainingGoal <= 0) return [];
 
     dueWords.shuffle();
@@ -156,7 +158,27 @@ Future<List<GreWord>> reviewSession(ReviewSessionRef ref) async {
   final todayMidnight = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
   List<GreWord> session = [];
 
-  for (final id in queueIds) {
+  final isPremium = await ref.watch(subscriptionStatusProvider.future);
+  int limit = queueIds.length;
+  // If not premium, limit the total daily session to 5 words
+  if (!isPremium) {
+    int reviewedTodayCount = 0;
+    for (final prog in progressQuery.values) {
+      if (prog.lastReviewDate != null) {
+        final lrDate = DateTime(prog.lastReviewDate!.year, prog.lastReviewDate!.month, prog.lastReviewDate!.day);
+        if (lrDate.isAtSameMomentAs(todayMidnight)) {
+          reviewedTodayCount++;
+        }
+      }
+    }
+    int maxAllowed = 5 - reviewedTodayCount;
+    if (maxAllowed < 0) maxAllowed = 0;
+    limit = maxAllowed;
+  }
+  
+  final allowedIds = queueIds.take(limit).toList();
+
+  for (final id in allowedIds) {
     try {
       final word = allWordsQuery.firstWhere((w) => w.originalInput == id);
       
@@ -185,7 +207,9 @@ Future<List<GreWord>> dailyWordsList(DailyWordsListRef ref) async {
   
   final todayMidnight = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
   
-  return allWordsQuery.where((w) {
+  final isPremium = await ref.watch(subscriptionStatusProvider.future);
+  
+  final List<GreWord> fullList = allWordsQuery.where((w) {
     // 1. In daily queue cache
     if (queueIds.contains(w.originalInput)) return true;
     
@@ -198,4 +222,9 @@ Future<List<GreWord>> dailyWordsList(DailyWordsListRef ref) async {
     
     return false;
   }).toList();
+  
+  if (!isPremium && fullList.length > 5) {
+    return fullList.take(5).toList();
+  }
+  return fullList;
 }

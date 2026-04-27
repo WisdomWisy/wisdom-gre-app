@@ -98,7 +98,7 @@ class PodcastController extends _$PodcastController {
         isLoading: true, sourceMode: mode, isPlaying: false, currentIndex: 0);
     try {
       if (mode == PodcastSourceMode.reviewSession) {
-        final q = await ref.read(reviewSessionProvider.future);
+        final q = await ref.read(dailyWordsListProvider.future);
         state = state.copyWith(queue: q, isLoading: false);
       } else {
         final all = await ref.read(vocabularyProvider.future);

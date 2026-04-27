@@ -68,7 +68,7 @@ final wordProgressRepositoryProvider = AutoDisposeAsyncNotifierProvider<
 
 typedef _$WordProgressRepository =
     AutoDisposeAsyncNotifier<Map<String, WordProgress>>;
-String _$dailyQueueHash() => r'f3ec9afd763d332d9029167d76663dc7d032c227';
+String _$dailyQueueHash() => r'14af2c7e81368dd75588a4f7255875fb8e3e0806';
 
 /// See also [DailyQueue].
 @ProviderFor(DailyQueue)

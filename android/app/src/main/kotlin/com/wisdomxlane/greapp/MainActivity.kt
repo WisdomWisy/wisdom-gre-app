@@ -1,4 +1,4 @@
-package com.wisdom.wisdom_gre_app
+package com.wisdomxlane.greapp
 
 import io.flutter.embedding.android.FlutterActivity
 

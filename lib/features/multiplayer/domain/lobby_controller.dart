@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:wisdom_gre_app/features/multiplayer/data/models/duel.dart';
+import 'package:wisdom_gre_app/features/multiplayer/data/models/profile.dart';
 import 'package:wisdom_gre_app/features/auth/domain/auth_state_provider.dart';
+import 'package:wisdom_gre_app/features/subscriptions/domain/subscription_provider.dart';
 
 part 'lobby_controller.g.dart';
 
@@ -188,6 +190,20 @@ class LobbyController extends _$LobbyController {
       if (user == null) {
         throw Exception("You must be authenticated to create a duel.");
       }
+      
+      final isPremium = await ref.read(subscriptionStatusProvider.future);
+      final profile = await ref.read(userProfileProvider.future);
+      
+      if (!isPremium && profile != null) {
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        if (profile.lastDuelDate != null) {
+          final lastDate = DateTime(profile.lastDuelDate!.year, profile.lastDuelDate!.month, profile.lastDuelDate!.day);
+          if (lastDate.isAtSameMomentAs(today) && profile.dailyDuelsCount >= 1) {
+             throw Exception("FREEMIUM_BLOCK");
+          }
+        }
+      }
 
       // Generate 6-char random code
       final random = Random();
@@ -215,6 +231,9 @@ class LobbyController extends _$LobbyController {
             'duel_id': duelId,
             'user_id': user.id,
           });
+          
+      // Increment daily duel count
+      await Supabase.instance.client.rpc('increment_daily_duel', params: {'user_uuid': user.id});
 
       final duel = await _fetchDuel(duelId);
       state = AsyncData(duel);
@@ -255,6 +274,20 @@ class LobbyController extends _$LobbyController {
       if (user == null) {
         throw Exception("You must be authenticated to join a duel.");
       }
+      
+      final isPremium = await ref.read(subscriptionStatusProvider.future);
+      final profile = await ref.read(userProfileProvider.future);
+      
+      if (!isPremium && profile != null) {
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        if (profile.lastDuelDate != null) {
+          final lastDate = DateTime(profile.lastDuelDate!.year, profile.lastDuelDate!.month, profile.lastDuelDate!.day);
+          if (lastDate.isAtSameMomentAs(today) && profile.dailyDuelsCount >= 1) {
+             throw Exception("FREEMIUM_BLOCK");
+          }
+        }
+      }
 
       final normalizedCode = code.toUpperCase().trim();
 
@@ -289,6 +322,9 @@ class LobbyController extends _$LobbyController {
               'duel_id': duelId,
               'user_id': user.id,
             });
+            
+        // Increment daily duel count
+        await Supabase.instance.client.rpc('increment_daily_duel', params: {'user_uuid': user.id});
       }
 
       final duel = await _fetchDuel(duelId);

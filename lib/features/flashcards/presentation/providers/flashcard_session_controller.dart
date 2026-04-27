@@ -7,6 +7,8 @@ import 'package:wisdom_gre_app/features/flashcards/data/models/word_progress.dar
 import 'package:wisdom_gre_app/features/dashboard/domain/providers/exam_goal_provider.dart';
 import 'package:wisdom_gre_app/features/vocabulary/domain/providers/vocabulary_provider.dart';
 
+import 'package:wisdom_gre_app/features/subscriptions/domain/subscription_provider.dart';
+
 part 'flashcard_session_controller.freezed.dart';
 part 'flashcard_session_controller.g.dart';
 
@@ -32,7 +34,6 @@ class FlashcardSessionController extends _$FlashcardSessionController {
   FutureOr<FlashcardSessionState> build() async {
     final srsQueue = await ref.watch(reviewSessionProvider.future);
     
-    // Preserve local Ghost/Review mode state even if SRS provider invalidates
     if (state.hasValue && 
         (state.value!.mode == FlashcardSessionMode.reviewAgain || 
          state.value!.mode == FlashcardSessionMode.anticipateGhost)) {
@@ -59,12 +60,10 @@ class FlashcardSessionController extends _$FlashcardSessionController {
       
       final newProgress = SRSHelper.calculateNextReview(progress, grade);
       
-      // Save progress (this will invalidate reviewSessionProvider and rebuild this controller)
       await ref.read(wordProgressRepositoryProvider.notifier).saveProgress(newProgress);
-      return; // The rebuild will naturally pop the queue because reviewSessionProvider filters out studied words
+      return; 
     }
 
-    // Ghost or Review mode: Just pop the queue locally without touching SRS!
     final newQueue = List<GreWord>.from(currentState.queue)..removeAt(0);
     state = AsyncData(currentState.copyWith(queue: newQueue));
   }
@@ -80,7 +79,12 @@ class FlashcardSessionController extends _$FlashcardSessionController {
     ));
   }
 
-  Future<void> startAnticipation(bool tracked) async {
+  Future<bool> startAnticipation(bool tracked) async {
+    final isPremium = await ref.read(subscriptionStatusProvider.future);
+    if (!isPremium) {
+      return false; // Freemium block
+    }
+
     state = const AsyncLoading();
     final allWordsQuery = await ref.read(vocabularyProvider.future);
     final totalWords = allWordsQuery.length;
@@ -96,7 +100,6 @@ class FlashcardSessionController extends _$FlashcardSessionController {
         initialQueueLength: srsQueue.length,
       ));
     } else {
-      // Ghost Mode
       final progressQuery = await ref.read(wordProgressRepositoryProvider.future);
       final currentQueueIds = await ref.read(dailyQueueProvider.future);
       
@@ -123,6 +126,8 @@ class FlashcardSessionController extends _$FlashcardSessionController {
         initialQueueLength: ghostQueue.length,
       ));
     }
+    
+    return true;
   }
 
   void resetToSrs() {

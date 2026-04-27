@@ -14,6 +14,9 @@ import 'package:wisdom_gre_app/features/multiplayer/presentation/multiplayer_lob
 import 'package:wisdom_gre_app/features/multiplayer/presentation/matchmaking_hub_screen.dart';
 import 'package:wisdom_gre_app/features/auth/domain/auth_state_provider.dart';
 import 'package:wisdom_gre_app/features/dashboard/presentation/profile_stats_screen.dart';
+import 'package:wisdom_gre_app/features/subscriptions/domain/subscription_provider.dart';
+import 'package:wisdom_gre_app/features/subscriptions/presentation/paywall_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -24,6 +27,7 @@ class DashboardScreen extends ConsumerWidget {
     final themeData = ref.watch(themeControllerProvider);
     final examDate = ref.watch(examDateProvider);
     final profileAsync = ref.watch(userProfileProvider);
+    final isPremium = ref.watch(subscriptionStatusProvider).value ?? false;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -38,6 +42,27 @@ class DashboardScreen extends ConsumerWidget {
                 Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  if (!isPremium)
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFD4AF37).withValues(alpha: 0.15),
+                        foregroundColor: const Color(0xFFD4AF37),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          side: const BorderSide(color: Color(0xFFD4AF37), width: 1),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      ),
+                      icon: const Icon(Icons.workspace_premium, size: 20),
+                      label: const Text('Upgrade', style: TextStyle(fontWeight: FontWeight.bold)),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const PaywallScreen()),
+                        );
+                      },
+                    ),
+                  const Spacer(),
                   IconButton(
                     icon: Icon(Icons.bar_chart_rounded, color: themeData.textColor, size: 28),
                     onPressed: () {
@@ -254,13 +279,19 @@ class DashboardScreen extends ConsumerWidget {
                               ),
                             ),
                             onPressed: () {
+                              if (!isPremium) {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(builder: (_) => const PaywallScreen()),
+                                );
+                                return;
+                              }
                               Navigator.of(context).push(
                                 MaterialPageRoute(builder: (_) => const PodcastScreen()),
                               );
                             },
-                            icon: Icon(Icons.headphones_rounded, color: themeData.isDarkMode ? Colors.white : const Color(0xFF111827)),
+                            icon: Icon(!isPremium ? Icons.lock : Icons.headphones_rounded, color: themeData.isDarkMode ? Colors.white : const Color(0xFF111827)),
                             label: Text(
-                              'Listen to Podcast',
+                              !isPremium ? 'Listen to Podcast (Premium)' : 'Listen to Podcast',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -280,6 +311,47 @@ class DashboardScreen extends ConsumerWidget {
                               ),
                             ),
                             onPressed: () async {
+                              if (!isPremium) {
+                                // Strict server-side check to prevent bypass due to stream lag
+                                try {
+                                  final user = ref.read(currentUserProvider);
+                                  if (user != null) {
+                                    final data = await Supabase.instance.client
+                                        .from('profiles')
+                                        .select('daily_duels_count, last_duel_date')
+                                        .eq('id', user.id)
+                                        .single();
+                                    
+                                    final count = data['daily_duels_count'] as int? ?? 0;
+                                    final lastDateStr = data['last_duel_date'] as String?;
+                                    
+                                    if (lastDateStr != null) {
+                                      final lastDate = DateTime.parse(lastDateStr).toLocal();
+                                      final now = DateTime.now();
+                                      if (lastDate.year == now.year && lastDate.month == now.month && lastDate.day == now.day) {
+                                        if (count >= 1) {
+                                          if (context.mounted) _showArenaLimitDialog(context, themeData);
+                                          return;
+                                        }
+                                      }
+                                    }
+                                  }
+                                } catch (_) {
+                                  // Fallback to local state if offline or error
+                                  final profile = ref.read(userProfileProvider).valueOrNull;
+                                  if (profile != null && profile.lastDuelDate != null) {
+                                    final lastDate = profile.lastDuelDate!.toLocal();
+                                    final now = DateTime.now();
+                                    if (lastDate.year == now.year && lastDate.month == now.month && lastDate.day == now.day) {
+                                      if (profile.dailyDuelsCount >= 1) {
+                                        if (context.mounted) _showArenaLimitDialog(context, themeData);
+                                        return;
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+
                               final List<ConnectivityResult> connectivityResult = await Connectivity().checkConnectivity();
                               if (connectivityResult.contains(ConnectivityResult.none)) {
                                 if (context.mounted) {
@@ -295,10 +367,10 @@ class DashboardScreen extends ConsumerWidget {
                                 );
                               }
                             },
-                            icon: const Icon(Icons.sports_esports),
-                            label: const Text(
-                              'Enter The Arena',
-                              style: TextStyle(
+                            icon: Icon(!isPremium ? Icons.lock : Icons.sports_esports),
+                            label: Text(
+                              !isPremium ? 'Enter The Arena (1/day)' : 'Enter The Arena',
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -316,6 +388,47 @@ class DashboardScreen extends ConsumerWidget {
                               ),
                             ),
                             onPressed: () async {
+                              if (!isPremium) {
+                                // Strict server-side check to prevent bypass due to stream lag
+                                try {
+                                  final user = ref.read(currentUserProvider);
+                                  if (user != null) {
+                                    final data = await Supabase.instance.client
+                                        .from('profiles')
+                                        .select('daily_duels_count, last_duel_date')
+                                        .eq('id', user.id)
+                                        .single();
+                                    
+                                    final count = data['daily_duels_count'] as int? ?? 0;
+                                    final lastDateStr = data['last_duel_date'] as String?;
+                                    
+                                    if (lastDateStr != null) {
+                                      final lastDate = DateTime.parse(lastDateStr).toLocal();
+                                      final now = DateTime.now();
+                                      if (lastDate.year == now.year && lastDate.month == now.month && lastDate.day == now.day) {
+                                        if (count >= 1) {
+                                          if (context.mounted) _showArenaLimitDialog(context, themeData);
+                                          return;
+                                        }
+                                      }
+                                    }
+                                  }
+                                } catch (_) {
+                                  // Fallback to local state if offline or error
+                                  final profile = ref.read(userProfileProvider).valueOrNull;
+                                  if (profile != null && profile.lastDuelDate != null) {
+                                    final lastDate = profile.lastDuelDate!.toLocal();
+                                    final now = DateTime.now();
+                                    if (lastDate.year == now.year && lastDate.month == now.month && lastDate.day == now.day) {
+                                      if (profile.dailyDuelsCount >= 1) {
+                                        if (context.mounted) _showArenaLimitDialog(context, themeData);
+                                        return;
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+
                               final List<ConnectivityResult> connectivityResult = await Connectivity().checkConnectivity();
                               if (connectivityResult.contains(ConnectivityResult.none)) {
                                 if (context.mounted) {
@@ -331,10 +444,10 @@ class DashboardScreen extends ConsumerWidget {
                                 );
                               }
                             },
-                            icon: const Icon(Icons.hub),
-                            label: const Text(
-                              'Multiplayer Lobby',
-                              style: TextStyle(
+                            icon: Icon(!isPremium ? Icons.lock : Icons.hub),
+                            label: Text(
+                              !isPremium ? 'Multiplayer Lobby (1/day)' : 'Multiplayer Lobby',
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -361,6 +474,45 @@ class DashboardScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void _showArenaLimitDialog(BuildContext context, AppThemeData theme) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: theme.surfaceColor,
+          title: Row(
+            children: [
+              const Icon(Icons.workspace_premium, color: Colors.amber, size: 32),
+              const SizedBox(width: 8),
+              Text('Daily Limit Reached', style: TextStyle(color: theme.textColor)),
+            ],
+          ),
+          content: Text(
+            "You have exhausted your daily free Arena ticket. Upgrade to Platinium for unlimited battles!",
+            style: TextStyle(color: theme.textColor),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel', style: TextStyle(color: theme.textColor.withOpacity(0.7))),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.amber[700],
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaywallScreen()));
+              },
+              child: const Text('Upgrade'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

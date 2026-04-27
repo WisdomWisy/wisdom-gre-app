@@ -11,6 +11,8 @@ import 'package:wisdom_gre_app/features/flashcards/presentation/providers/flashc
 import 'package:wisdom_gre_app/features/flashcards/domain/review_session_provider.dart';
 import 'package:wisdom_gre_app/features/dashboard/domain/providers/exam_goal_provider.dart';
 import 'package:wisdom_gre_app/features/vocabulary/domain/providers/vocabulary_provider.dart';
+import 'package:wisdom_gre_app/features/subscriptions/domain/subscription_provider.dart';
+import 'package:wisdom_gre_app/features/subscriptions/presentation/paywall_screen.dart';
 import 'dart:ui';
 
 class FlashcardScreen extends ConsumerStatefulWidget {
@@ -76,9 +78,12 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen> {
                         minimumSize: const Size(double.infinity, 56),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         Navigator.pop(context);
-                        ref.read(flashcardSessionControllerProvider.notifier).startAnticipation(true);
+                        final success = await ref.read(flashcardSessionControllerProvider.notifier).startAnticipation(true);
+                        if (!success && mounted) {
+                          _showPremiumPaywall(theme);
+                        }
                       },
                       child: const Text('Yes, track progress', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                     ),
@@ -90,9 +95,12 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen> {
                         side: BorderSide(color: theme.textColor.withOpacity(0.5)),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         Navigator.pop(context);
-                        ref.read(flashcardSessionControllerProvider.notifier).startAnticipation(false);
+                        final success = await ref.read(flashcardSessionControllerProvider.notifier).startAnticipation(false);
+                        if (!success && mounted) {
+                          _showPremiumPaywall(theme);
+                        }
                       },
                       child: Text('No, Ghost Mode', style: TextStyle(color: theme.textColor, fontSize: 18)),
                     ),
@@ -101,6 +109,45 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen> {
               ),
             ),
           ),
+        );
+      },
+    );
+  }
+
+  void _showPremiumPaywall(AppThemeData theme) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: theme.surfaceColor,
+          title: Row(
+            children: [
+              const Icon(Icons.workspace_premium, color: Colors.amber, size: 32),
+              const SizedBox(width: 8),
+              Text('Premium Required', style: TextStyle(color: theme.textColor)),
+            ],
+          ),
+          content: Text(
+            "You've reached your daily free limit. Unlock everything to conquer the GRE!",
+            style: TextStyle(color: theme.textColor),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Maybe Later', style: TextStyle(color: theme.textColor.withOpacity(0.7))),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.amber[700],
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaywallScreen()));
+              },
+              child: const Text('View Premium Plans'),
+            ),
+          ],
         );
       },
     );
@@ -208,7 +255,12 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen> {
                       if (sessionState.mode == FlashcardSessionMode.srs) ...[
                         const SizedBox(height: 32),
                         OutlinedButton.icon(
-                          onPressed: () {
+                          onPressed: () async {
+                            final isPremium = await ref.read(subscriptionStatusProvider.future);
+                            if (!isPremium && context.mounted) {
+                               Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PaywallScreen()));
+                               return;
+                            }
                             _showAnticipateDialog(themeData);
                           },
                           icon: Icon(Icons.fast_forward, color: themeData.textColor),
@@ -278,10 +330,34 @@ class _FlashcardScreenState extends ConsumerState<FlashcardScreen> {
             if (sessionState.mode == FlashcardSessionMode.anticipateTracked) modeBadge = 'ANTICIPATING (TRACKED)';
             if (sessionState.mode == FlashcardSessionMode.reviewAgain) modeBadge = 'REVIEWING';
 
+            final isPremium = ref.watch(subscriptionStatusProvider).value ?? false;
+
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
               child: Column(
                 children: [
+                  if (!isPremium && sessionState.mode == FlashcardSessionMode.srs)
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.amber.withOpacity(0.5)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.lock_clock, color: Colors.amber, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Free Daily Limit Active (Max 5). Unlock Platinium for unlimited!',
+                              style: TextStyle(color: themeData.textColor, fontSize: 12),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   // Progress Text
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,

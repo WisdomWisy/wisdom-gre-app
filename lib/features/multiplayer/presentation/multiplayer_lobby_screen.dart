@@ -76,13 +76,17 @@ class _MultiplayerLobbyScreenState extends ConsumerState<MultiplayerLobbyScreen>
 
     ref.listen(lobbyControllerProvider, (previous, next) {
       if (next.hasError) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('STATE ERROR: ${next.error}'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 10),
-          ),
-        );
+        if (next.error.toString().contains('FREEMIUM_BLOCK')) {
+           _showPremiumPaywall(baseTheme);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('STATE ERROR: ${next.error}'),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 10),
+            ),
+          );
+        }
       } else {
         final nextDuel = next.valueOrNull;
         if (nextDuel?.status == 'playing' && nextDuel != null) {
@@ -651,5 +655,44 @@ class _MultiplayerLobbyScreenState extends ConsumerState<MultiplayerLobbyScreen>
     if (result == true) {
       onConfirm();
     }
+  }
+
+  void _showPremiumPaywall(AppThemeData theme) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: theme.surfaceColor,
+          title: Row(
+            children: [
+              const Icon(Icons.workspace_premium, color: Colors.amber, size: 32),
+              const SizedBox(width: 8),
+              Text('Premium Required', style: TextStyle(color: theme.textColor)),
+            ],
+          ),
+          content: Text(
+            "You've reached your daily free limit for the Arena (1 duel/day). Unlock everything to conquer the GRE!",
+            style: TextStyle(color: theme.textColor),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Maybe Later', style: TextStyle(color: theme.textColor.withOpacity(0.7))),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.amber[700],
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+                // Future Paywall UI
+              },
+              child: const Text('View Premium Plans'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
