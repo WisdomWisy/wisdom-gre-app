@@ -224,12 +224,15 @@ class DashboardScreen extends ConsumerWidget {
                               children: [
                                 Icon(Icons.flag, color: themeData.textColor),
                                 const SizedBox(width: 12),
-                                Text(
-                                  'Your goal: $dailyGoalValue words / day',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: themeData.textColor,
+                                Flexible(
+                                  child: Text(
+                                    'Your goal: $dailyGoalValue words / day',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: themeData.textColor,
+                                    ),
                                   ),
                                 ),
                               ],

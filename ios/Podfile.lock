@@ -1,0 +1,102 @@
+PODS:
+  - app_links (6.4.1):
+    - Flutter
+  - audio_session (0.0.1):
+    - Flutter
+  - connectivity_plus (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+  - flutter_foreground_task (0.0.1):
+    - Flutter
+  - flutter_tts (0.0.1):
+    - Flutter
+  - just_audio (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - package_info_plus (0.4.5):
+    - Flutter
+  - path_provider_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - purchases_flutter (10.0.1):
+    - Flutter
+    - PurchasesHybridCommon (= 18.1.0)
+  - PurchasesHybridCommon (18.1.0):
+    - RevenueCat (= 5.68.0)
+  - RevenueCat (5.68.0)
+  - shared_preferences_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - url_launcher_ios (0.0.1):
+    - Flutter
+  - wakelock_plus (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - app_links (from `.symlinks/plugins/app_links/ios`)
+  - audio_session (from `.symlinks/plugins/audio_session/ios`)
+  - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
+  - Flutter (from `Flutter`)
+  - flutter_foreground_task (from `.symlinks/plugins/flutter_foreground_task/ios`)
+  - flutter_tts (from `.symlinks/plugins/flutter_tts/ios`)
+  - just_audio (from `.symlinks/plugins/just_audio/darwin`)
+  - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - purchases_flutter (from `.symlinks/plugins/purchases_flutter/ios`)
+  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
+  - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
+  - wakelock_plus (from `.symlinks/plugins/wakelock_plus/ios`)
+
+SPEC REPOS:
+  trunk:
+    - PurchasesHybridCommon
+    - RevenueCat
+
+EXTERNAL SOURCES:
+  app_links:
+    :path: ".symlinks/plugins/app_links/ios"
+  audio_session:
+    :path: ".symlinks/plugins/audio_session/ios"
+  connectivity_plus:
+    :path: ".symlinks/plugins/connectivity_plus/ios"
+  Flutter:
+    :path: Flutter
+  flutter_foreground_task:
+    :path: ".symlinks/plugins/flutter_foreground_task/ios"
+  flutter_tts:
+    :path: ".symlinks/plugins/flutter_tts/ios"
+  just_audio:
+    :path: ".symlinks/plugins/just_audio/darwin"
+  package_info_plus:
+    :path: ".symlinks/plugins/package_info_plus/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  purchases_flutter:
+    :path: ".symlinks/plugins/purchases_flutter/ios"
+  shared_preferences_foundation:
+    :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
+  url_launcher_ios:
+    :path: ".symlinks/plugins/url_launcher_ios/ios"
+  wakelock_plus:
+    :path: ".symlinks/plugins/wakelock_plus/ios"
+
+SPEC CHECKSUMS:
+  app_links: 3dbc685f76b1693c66a6d9dd1e9ab6f73d97dc0a
+  audio_session: 9bb7f6c970f21241b19f5a3658097ae459681ba0
+  connectivity_plus: cb623214f4e1f6ef8fe7403d580fdad517d2f7dd
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  flutter_foreground_task: a159d2c2173b33699ddb3e6c2a067045d7cebb89
+  flutter_tts: 35ac3c7d42412733e795ea96ad2d7e05d0a75113
+  just_audio: 4e391f57b79cad2b0674030a00453ca5ce817eed
+  package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
+  path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
+  purchases_flutter: 50a5d9fa83ee5605a8fc653792d667404ca90bce
+  PurchasesHybridCommon: 32902b8fad349cf549f096183926ee33af00e36a
+  RevenueCat: c535d3739d51163f6d9d5dbd01c7b5d93b718ff5
+  shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
+  url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
+  wakelock_plus: e29112ab3ef0b318e58cfa5c32326458be66b556
+
+PODFILE CHECKSUM: 1ddcd8d10938c4866bf4874d202cec571acb2cb9
+
+COCOAPODS: 1.16.2
