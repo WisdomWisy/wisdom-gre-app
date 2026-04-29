@@ -5,6 +5,8 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:wisdom_gre_app/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:wisdom_gre_app/features/auth/presentation/auth_screen.dart';
 import 'package:wisdom_gre_app/features/auth/domain/auth_state_provider.dart';
@@ -17,7 +19,8 @@ void main() async {
   FlutterForegroundTask.initCommunicationPort();
   
   // Load environment variables
-  await dotenv.load(fileName: ".env");
+  const env = String.fromEnvironment('ENV', defaultValue: 'dev');
+  await dotenv.load(fileName: ".env.$env");
 
   // Initialize Supabase
   await Supabase.initialize(
@@ -27,7 +30,13 @@ void main() async {
 
   await _initRevenueCat();
 
-  runApp(const ProviderScope(child: WisdomGreApp()));
+  await SentryFlutter.init(
+    (options) {
+      options.dsn = dotenv.env['SENTRY_DSN'];
+      options.tracesSampleRate = 1.0;
+    },
+    appRunner: () => runApp(const ProviderScope(child: WisdomGreApp())),
+  );
 }
 
 Future<void> _initRevenueCat() async {
@@ -64,11 +73,29 @@ Future<void> _initRevenueCat() async {
   });
 }
 
-class WisdomGreApp extends ConsumerWidget {
+class WisdomGreApp extends ConsumerStatefulWidget {
   const WisdomGreApp({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<WisdomGreApp> createState() => _WisdomGreAppState();
+}
+
+class _WisdomGreAppState extends ConsumerState<WisdomGreApp> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (Platform.isIOS) {
+        final TrackingStatus status = await AppTrackingTransparency.trackingAuthorizationStatus;
+        if (status == TrackingStatus.notDetermined) {
+          await AppTrackingTransparency.requestTrackingAuthorization();
+        }
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     // Watch AuthState to handle implicit routing
     final authStateAsync = ref.watch(authStateProvider);
 
