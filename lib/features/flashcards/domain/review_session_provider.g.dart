@@ -6,7 +6,7 @@ part of 'review_session_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$reviewSessionHash() => r'1e41f567f516dfca50a7162af554bded06f977d5';
+String _$reviewSessionHash() => r'd384fb7fd05b712942578b8e4ce563c4fbdf0565';
 
 /// Represents the active session queue for the day (excluding already reviewed)
 ///
@@ -26,7 +26,7 @@ final reviewSessionProvider = AutoDisposeFutureProvider<List<GreWord>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ReviewSessionRef = AutoDisposeFutureProviderRef<List<GreWord>>;
-String _$dailyWordsListHash() => r'5d28a0f7c9cfabe5f3e9fd64cd8dad7b9e3a5923';
+String _$dailyWordsListHash() => r'f07173b29ff8dad72b3fefe7a99b21a5aec43b95';
 
 /// Represents the full daily list (including already reviewed)
 ///
@@ -68,7 +68,7 @@ final wordProgressRepositoryProvider = AutoDisposeAsyncNotifierProvider<
 
 typedef _$WordProgressRepository =
     AutoDisposeAsyncNotifier<Map<String, WordProgress>>;
-String _$dailyQueueHash() => r'14af2c7e81368dd75588a4f7255875fb8e3e0806';
+String _$dailyQueueHash() => r'07a8e3dbccac8033640fffef577193768c41743c';
 
 /// See also [DailyQueue].
 @ProviderFor(DailyQueue)

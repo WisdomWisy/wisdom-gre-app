@@ -116,6 +116,16 @@ class DashboardScreen extends ConsumerWidget {
                 data: (words) {
                   final dailyGoalValue = ref.watch(dailyGoalProvider(totalWords: words.length));
                   
+                  int easyCount = 0;
+                  int mediumCount = 0;
+                  int hardCount = 0;
+                  for (final w in words) {
+                    final d = w.difficulty.toLowerCase();
+                    if (d == 'easy') easyCount++;
+                    else if (d == 'medium') mediumCount++;
+                    else if (d == 'hard') hardCount++;
+                  }
+                  
                     return Container(
                       padding: const EdgeInsets.all(28),
                       decoration: BoxDecoration(
@@ -161,6 +171,15 @@ class DashboardScreen extends ConsumerWidget {
                                 color: themeData.textColor,
                               ),
                             ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Easy: $easyCount', style: TextStyle(color: Colors.greenAccent, fontSize: 12, fontWeight: FontWeight.bold)),
+                            Text('Medium: $mediumCount', style: TextStyle(color: Colors.orangeAccent, fontSize: 12, fontWeight: FontWeight.bold)),
+                            Text('Hard: $hardCount', style: TextStyle(color: Colors.redAccent, fontSize: 12, fontWeight: FontWeight.bold)),
                           ],
                         ),
                         const SizedBox(height: 20),

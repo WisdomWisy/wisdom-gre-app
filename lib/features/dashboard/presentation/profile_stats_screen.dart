@@ -93,7 +93,11 @@ class _ProfileStatsScreenState extends ConsumerState<ProfileStatsScreen> with Si
                       _buildVocabularySection(stats, surfaceColor, textColor),
                       const SizedBox(height: 32),
 
-                      // Section 4: Daily Streak
+                      // Section 4: Difficulty Breakdown
+                      _buildDifficultySection(stats, surfaceColor, textColor),
+                      const SizedBox(height: 32),
+
+                      // Section 5: Daily Streak
                       _buildStreakSection(stats, surfaceColor, textColor),
                       const SizedBox(height: 32),
                     ],
@@ -361,6 +365,58 @@ class _ProfileStatsScreenState extends ConsumerState<ProfileStatsScreen> with Si
           style: GoogleFonts.inter(
             color: Colors.white70,
             fontSize: 11,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDifficultySection(ProfileStatsState stats, Color surfaceColor, Color textColor) {
+    return _buildGlassContainer(
+      surfaceColor: surfaceColor,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "DIFFICULTY BREAKDOWN",
+            style: GoogleFonts.outfit(
+              color: textColor.withValues(alpha: 0.7),
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.5,
+              fontSize: 12,
+            ),
+          ),
+          const SizedBox(height: 20),
+          _buildDiffRow("Easy", stats.seenEasy, stats.totalEasy, Colors.greenAccent),
+          const SizedBox(height: 12),
+          _buildDiffRow("Medium", stats.seenMedium, stats.totalMedium, Colors.orangeAccent),
+          const SizedBox(height: 12),
+          _buildDiffRow("Hard", stats.seenHard, stats.totalHard, Colors.redAccent),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDiffRow(String label, int seen, int total, Color color) {
+    final double progress = total > 0 ? seen / total : 0;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label, style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
+            Text("$seen / $total", style: GoogleFonts.inter(color: Colors.white70, fontSize: 12)),
+          ],
+        ),
+        const SizedBox(height: 8),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: progress,
+            backgroundColor: color.withValues(alpha: 0.2),
+            valueColor: AlwaysStoppedAnimation<Color>(color),
+            minHeight: 8,
           ),
         ),
       ],

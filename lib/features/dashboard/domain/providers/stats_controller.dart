@@ -16,6 +16,13 @@ class ProfileStatsState {
   final int learningWords;
   final int toReviewWords;
 
+  final int totalEasy;
+  final int totalMedium;
+  final int totalHard;
+  final int seenEasy;
+  final int seenMedium;
+  final int seenHard;
+
   ProfileStatsState({
     required this.arenaWins,
     required this.arenaLosses,
@@ -24,6 +31,12 @@ class ProfileStatsState {
     required this.masteredWords,
     required this.learningWords,
     required this.toReviewWords,
+    required this.totalEasy,
+    required this.totalMedium,
+    required this.totalHard,
+    required this.seenEasy,
+    required this.seenMedium,
+    required this.seenHard,
   });
 }
 
@@ -47,7 +60,31 @@ class StatsController extends _$StatsController {
     int mastered = 0;
     int learning = 0;
 
+    int totalEasy = 0;
+    int totalMedium = 0;
+    int totalHard = 0;
+    int seenEasy = 0;
+    int seenMedium = 0;
+    int seenHard = 0;
+
+    // Calculate total words per difficulty
+    for (final word in vocabulary) {
+      final diff = word.difficulty.toLowerCase();
+      if (diff == 'easy') totalEasy++;
+      else if (diff == 'medium') totalMedium++;
+      else if (diff == 'hard') totalHard++;
+    }
+
     for (final prog in progressMap.values) {
+      // Find the word's difficulty for "seen" stats
+      try {
+        final word = vocabulary.firstWhere((w) => w.originalInput == prog.wordId);
+        final diff = word.difficulty.toLowerCase();
+        if (diff == 'easy') seenEasy++;
+        else if (diff == 'medium') seenMedium++;
+        else if (diff == 'hard') seenHard++;
+      } catch (_) {}
+
       if (prog.interval > 21) {
         mastered++;
       } else if (prog.interval > 0 && prog.interval <= 21) {
@@ -65,6 +102,12 @@ class StatsController extends _$StatsController {
       masteredWords: mastered,
       learningWords: learning,
       toReviewWords: toReview,
+      totalEasy: totalEasy,
+      totalMedium: totalMedium,
+      totalHard: totalHard,
+      seenEasy: seenEasy,
+      seenMedium: seenMedium,
+      seenHard: seenHard,
     );
   }
 }

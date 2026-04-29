@@ -6,6 +6,8 @@ import 'package:wisdom_gre_app/core/providers/tts_settings_provider.dart';
 import 'package:wisdom_gre_app/features/auth/domain/auth_state_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:wisdom_gre_app/features/subscriptions/domain/promo_code_service.dart';
+import 'package:wisdom_gre_app/core/providers/difficulty_filter_provider.dart';
+import 'package:wisdom_gre_app/features/flashcards/domain/review_session_provider.dart';
 
 /// Application-wide settings dialog.
 ///
@@ -88,6 +90,40 @@ class SettingsDialog extends ConsumerWidget {
                 if (lang != null) {
                   ref.read(languageControllerProvider.notifier).setLanguage(lang);
                 }
+              },
+            ),
+          ),
+
+          const Divider(height: 24),
+
+          // ── Practice Difficulty ─────────────────────────────
+          _SectionHeader('Practice Difficulty', theme),
+          ListTile(
+            dense: true,
+            leading: Icon(Icons.school_outlined, color: theme.textColor),
+            title: Text('Target Difficulty', style: TextStyle(color: theme.textColor)),
+            trailing: Consumer(
+              builder: (context, ref, child) {
+                final difficulty = ref.watch(difficultyFilterControllerProvider);
+                return DropdownButton<String>(
+                  value: difficulty,
+                  dropdownColor: theme.surfaceColor,
+                  underline: const SizedBox.shrink(),
+                  style: TextStyle(color: theme.textColor, fontWeight: FontWeight.w600),
+                  items: const [
+                    DropdownMenuItem(value: 'all', child: Text('All Levels')),
+                    DropdownMenuItem(value: 'easy', child: Text('Easy')),
+                    DropdownMenuItem(value: 'medium', child: Text('Medium')),
+                    DropdownMenuItem(value: 'hard', child: Text('Hard')),
+                  ],
+                  onChanged: (val) async {
+                    if (val != null) {
+                      await ref.read(difficultyFilterControllerProvider.notifier).setDifficulty(val);
+                      // Force invalidate the daily queue provider
+                      ref.invalidate(dailyQueueProvider);
+                    }
+                  },
+                );
               },
             ),
           ),

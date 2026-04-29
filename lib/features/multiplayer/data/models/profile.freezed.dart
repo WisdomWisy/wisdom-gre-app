@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Profile {
 
- String get id; String get username;@JsonKey(name: 'first_name') String? get firstName;@JsonKey(name: 'last_name') String? get lastName; String? get email;@JsonKey(name: 'avatar_url') String? get avatarUrl;@JsonKey(name: 'arena_wins') int? get arenaWins;@JsonKey(name: 'arena_losses') int? get arenaLosses;@JsonKey(name: 'current_streak') int? get currentStreak;@JsonKey(name: 'daily_duels_count') int get dailyDuelsCount;@JsonKey(name: 'last_duel_date') DateTime? get lastDuelDate;
+ String get id; String get username;@JsonKey(name: 'first_name') String? get firstName;@JsonKey(name: 'last_name') String? get lastName; String? get email;@JsonKey(name: 'avatar_url') String? get avatarUrl;@JsonKey(name: 'arena_wins') int? get arenaWins;@JsonKey(name: 'arena_losses') int? get arenaLosses;@JsonKey(name: 'current_streak') int? get currentStreak;@JsonKey(name: 'daily_duels_count') int get dailyDuelsCount;@JsonKey(name: 'last_duel_date') DateTime? get lastDuelDate;@JsonKey(name: 'difficulty_preference') String get difficultyPreference;
 /// Create a copy of Profile
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $ProfileCopyWith<Profile> get copyWith => _$ProfileCopyWithImpl<Profile>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Profile&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.email, email) || other.email == email)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl)&&(identical(other.arenaWins, arenaWins) || other.arenaWins == arenaWins)&&(identical(other.arenaLosses, arenaLosses) || other.arenaLosses == arenaLosses)&&(identical(other.currentStreak, currentStreak) || other.currentStreak == currentStreak)&&(identical(other.dailyDuelsCount, dailyDuelsCount) || other.dailyDuelsCount == dailyDuelsCount)&&(identical(other.lastDuelDate, lastDuelDate) || other.lastDuelDate == lastDuelDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Profile&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.email, email) || other.email == email)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl)&&(identical(other.arenaWins, arenaWins) || other.arenaWins == arenaWins)&&(identical(other.arenaLosses, arenaLosses) || other.arenaLosses == arenaLosses)&&(identical(other.currentStreak, currentStreak) || other.currentStreak == currentStreak)&&(identical(other.dailyDuelsCount, dailyDuelsCount) || other.dailyDuelsCount == dailyDuelsCount)&&(identical(other.lastDuelDate, lastDuelDate) || other.lastDuelDate == lastDuelDate)&&(identical(other.difficultyPreference, difficultyPreference) || other.difficultyPreference == difficultyPreference));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,username,firstName,lastName,email,avatarUrl,arenaWins,arenaLosses,currentStreak,dailyDuelsCount,lastDuelDate);
+int get hashCode => Object.hash(runtimeType,id,username,firstName,lastName,email,avatarUrl,arenaWins,arenaLosses,currentStreak,dailyDuelsCount,lastDuelDate,difficultyPreference);
 
 @override
 String toString() {
-  return 'Profile(id: $id, username: $username, firstName: $firstName, lastName: $lastName, email: $email, avatarUrl: $avatarUrl, arenaWins: $arenaWins, arenaLosses: $arenaLosses, currentStreak: $currentStreak, dailyDuelsCount: $dailyDuelsCount, lastDuelDate: $lastDuelDate)';
+  return 'Profile(id: $id, username: $username, firstName: $firstName, lastName: $lastName, email: $email, avatarUrl: $avatarUrl, arenaWins: $arenaWins, arenaLosses: $arenaLosses, currentStreak: $currentStreak, dailyDuelsCount: $dailyDuelsCount, lastDuelDate: $lastDuelDate, difficultyPreference: $difficultyPreference)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $ProfileCopyWith<$Res>  {
   factory $ProfileCopyWith(Profile value, $Res Function(Profile) _then) = _$ProfileCopyWithImpl;
 @useResult
 $Res call({
- String id, String username,@JsonKey(name: 'first_name') String? firstName,@JsonKey(name: 'last_name') String? lastName, String? email,@JsonKey(name: 'avatar_url') String? avatarUrl,@JsonKey(name: 'arena_wins') int? arenaWins,@JsonKey(name: 'arena_losses') int? arenaLosses,@JsonKey(name: 'current_streak') int? currentStreak,@JsonKey(name: 'daily_duels_count') int dailyDuelsCount,@JsonKey(name: 'last_duel_date') DateTime? lastDuelDate
+ String id, String username,@JsonKey(name: 'first_name') String? firstName,@JsonKey(name: 'last_name') String? lastName, String? email,@JsonKey(name: 'avatar_url') String? avatarUrl,@JsonKey(name: 'arena_wins') int? arenaWins,@JsonKey(name: 'arena_losses') int? arenaLosses,@JsonKey(name: 'current_streak') int? currentStreak,@JsonKey(name: 'daily_duels_count') int dailyDuelsCount,@JsonKey(name: 'last_duel_date') DateTime? lastDuelDate,@JsonKey(name: 'difficulty_preference') String difficultyPreference
 });
 
 
@@ -65,7 +65,7 @@ class _$ProfileCopyWithImpl<$Res>
 
 /// Create a copy of Profile
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? username = null,Object? firstName = freezed,Object? lastName = freezed,Object? email = freezed,Object? avatarUrl = freezed,Object? arenaWins = freezed,Object? arenaLosses = freezed,Object? currentStreak = freezed,Object? dailyDuelsCount = null,Object? lastDuelDate = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? username = null,Object? firstName = freezed,Object? lastName = freezed,Object? email = freezed,Object? avatarUrl = freezed,Object? arenaWins = freezed,Object? arenaLosses = freezed,Object? currentStreak = freezed,Object? dailyDuelsCount = null,Object? lastDuelDate = freezed,Object? difficultyPreference = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
@@ -78,7 +78,8 @@ as int?,arenaLosses: freezed == arenaLosses ? _self.arenaLosses : arenaLosses //
 as int?,currentStreak: freezed == currentStreak ? _self.currentStreak : currentStreak // ignore: cast_nullable_to_non_nullable
 as int?,dailyDuelsCount: null == dailyDuelsCount ? _self.dailyDuelsCount : dailyDuelsCount // ignore: cast_nullable_to_non_nullable
 as int,lastDuelDate: freezed == lastDuelDate ? _self.lastDuelDate : lastDuelDate // ignore: cast_nullable_to_non_nullable
-as DateTime?,
+as DateTime?,difficultyPreference: null == difficultyPreference ? _self.difficultyPreference : difficultyPreference // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 
@@ -163,10 +164,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String username, @JsonKey(name: 'first_name')  String? firstName, @JsonKey(name: 'last_name')  String? lastName,  String? email, @JsonKey(name: 'avatar_url')  String? avatarUrl, @JsonKey(name: 'arena_wins')  int? arenaWins, @JsonKey(name: 'arena_losses')  int? arenaLosses, @JsonKey(name: 'current_streak')  int? currentStreak, @JsonKey(name: 'daily_duels_count')  int dailyDuelsCount, @JsonKey(name: 'last_duel_date')  DateTime? lastDuelDate)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String username, @JsonKey(name: 'first_name')  String? firstName, @JsonKey(name: 'last_name')  String? lastName,  String? email, @JsonKey(name: 'avatar_url')  String? avatarUrl, @JsonKey(name: 'arena_wins')  int? arenaWins, @JsonKey(name: 'arena_losses')  int? arenaLosses, @JsonKey(name: 'current_streak')  int? currentStreak, @JsonKey(name: 'daily_duels_count')  int dailyDuelsCount, @JsonKey(name: 'last_duel_date')  DateTime? lastDuelDate, @JsonKey(name: 'difficulty_preference')  String difficultyPreference)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Profile() when $default != null:
-return $default(_that.id,_that.username,_that.firstName,_that.lastName,_that.email,_that.avatarUrl,_that.arenaWins,_that.arenaLosses,_that.currentStreak,_that.dailyDuelsCount,_that.lastDuelDate);case _:
+return $default(_that.id,_that.username,_that.firstName,_that.lastName,_that.email,_that.avatarUrl,_that.arenaWins,_that.arenaLosses,_that.currentStreak,_that.dailyDuelsCount,_that.lastDuelDate,_that.difficultyPreference);case _:
   return orElse();
 
 }
@@ -184,10 +185,10 @@ return $default(_that.id,_that.username,_that.firstName,_that.lastName,_that.ema
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String username, @JsonKey(name: 'first_name')  String? firstName, @JsonKey(name: 'last_name')  String? lastName,  String? email, @JsonKey(name: 'avatar_url')  String? avatarUrl, @JsonKey(name: 'arena_wins')  int? arenaWins, @JsonKey(name: 'arena_losses')  int? arenaLosses, @JsonKey(name: 'current_streak')  int? currentStreak, @JsonKey(name: 'daily_duels_count')  int dailyDuelsCount, @JsonKey(name: 'last_duel_date')  DateTime? lastDuelDate)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String username, @JsonKey(name: 'first_name')  String? firstName, @JsonKey(name: 'last_name')  String? lastName,  String? email, @JsonKey(name: 'avatar_url')  String? avatarUrl, @JsonKey(name: 'arena_wins')  int? arenaWins, @JsonKey(name: 'arena_losses')  int? arenaLosses, @JsonKey(name: 'current_streak')  int? currentStreak, @JsonKey(name: 'daily_duels_count')  int dailyDuelsCount, @JsonKey(name: 'last_duel_date')  DateTime? lastDuelDate, @JsonKey(name: 'difficulty_preference')  String difficultyPreference)  $default,) {final _that = this;
 switch (_that) {
 case _Profile():
-return $default(_that.id,_that.username,_that.firstName,_that.lastName,_that.email,_that.avatarUrl,_that.arenaWins,_that.arenaLosses,_that.currentStreak,_that.dailyDuelsCount,_that.lastDuelDate);case _:
+return $default(_that.id,_that.username,_that.firstName,_that.lastName,_that.email,_that.avatarUrl,_that.arenaWins,_that.arenaLosses,_that.currentStreak,_that.dailyDuelsCount,_that.lastDuelDate,_that.difficultyPreference);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -204,10 +205,10 @@ return $default(_that.id,_that.username,_that.firstName,_that.lastName,_that.ema
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String username, @JsonKey(name: 'first_name')  String? firstName, @JsonKey(name: 'last_name')  String? lastName,  String? email, @JsonKey(name: 'avatar_url')  String? avatarUrl, @JsonKey(name: 'arena_wins')  int? arenaWins, @JsonKey(name: 'arena_losses')  int? arenaLosses, @JsonKey(name: 'current_streak')  int? currentStreak, @JsonKey(name: 'daily_duels_count')  int dailyDuelsCount, @JsonKey(name: 'last_duel_date')  DateTime? lastDuelDate)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String username, @JsonKey(name: 'first_name')  String? firstName, @JsonKey(name: 'last_name')  String? lastName,  String? email, @JsonKey(name: 'avatar_url')  String? avatarUrl, @JsonKey(name: 'arena_wins')  int? arenaWins, @JsonKey(name: 'arena_losses')  int? arenaLosses, @JsonKey(name: 'current_streak')  int? currentStreak, @JsonKey(name: 'daily_duels_count')  int dailyDuelsCount, @JsonKey(name: 'last_duel_date')  DateTime? lastDuelDate, @JsonKey(name: 'difficulty_preference')  String difficultyPreference)?  $default,) {final _that = this;
 switch (_that) {
 case _Profile() when $default != null:
-return $default(_that.id,_that.username,_that.firstName,_that.lastName,_that.email,_that.avatarUrl,_that.arenaWins,_that.arenaLosses,_that.currentStreak,_that.dailyDuelsCount,_that.lastDuelDate);case _:
+return $default(_that.id,_that.username,_that.firstName,_that.lastName,_that.email,_that.avatarUrl,_that.arenaWins,_that.arenaLosses,_that.currentStreak,_that.dailyDuelsCount,_that.lastDuelDate,_that.difficultyPreference);case _:
   return null;
 
 }
@@ -219,7 +220,7 @@ return $default(_that.id,_that.username,_that.firstName,_that.lastName,_that.ema
 @JsonSerializable()
 
 class _Profile implements Profile {
-  const _Profile({required this.id, required this.username, @JsonKey(name: 'first_name') this.firstName, @JsonKey(name: 'last_name') this.lastName, this.email, @JsonKey(name: 'avatar_url') this.avatarUrl, @JsonKey(name: 'arena_wins') this.arenaWins, @JsonKey(name: 'arena_losses') this.arenaLosses, @JsonKey(name: 'current_streak') this.currentStreak, @JsonKey(name: 'daily_duels_count') this.dailyDuelsCount = 0, @JsonKey(name: 'last_duel_date') this.lastDuelDate});
+  const _Profile({required this.id, required this.username, @JsonKey(name: 'first_name') this.firstName, @JsonKey(name: 'last_name') this.lastName, this.email, @JsonKey(name: 'avatar_url') this.avatarUrl, @JsonKey(name: 'arena_wins') this.arenaWins, @JsonKey(name: 'arena_losses') this.arenaLosses, @JsonKey(name: 'current_streak') this.currentStreak, @JsonKey(name: 'daily_duels_count') this.dailyDuelsCount = 0, @JsonKey(name: 'last_duel_date') this.lastDuelDate, @JsonKey(name: 'difficulty_preference') this.difficultyPreference = 'all'});
   factory _Profile.fromJson(Map<String, dynamic> json) => _$ProfileFromJson(json);
 
 @override final  String id;
@@ -233,6 +234,7 @@ class _Profile implements Profile {
 @override@JsonKey(name: 'current_streak') final  int? currentStreak;
 @override@JsonKey(name: 'daily_duels_count') final  int dailyDuelsCount;
 @override@JsonKey(name: 'last_duel_date') final  DateTime? lastDuelDate;
+@override@JsonKey(name: 'difficulty_preference') final  String difficultyPreference;
 
 /// Create a copy of Profile
 /// with the given fields replaced by the non-null parameter values.
@@ -247,16 +249,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Profile&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.email, email) || other.email == email)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl)&&(identical(other.arenaWins, arenaWins) || other.arenaWins == arenaWins)&&(identical(other.arenaLosses, arenaLosses) || other.arenaLosses == arenaLosses)&&(identical(other.currentStreak, currentStreak) || other.currentStreak == currentStreak)&&(identical(other.dailyDuelsCount, dailyDuelsCount) || other.dailyDuelsCount == dailyDuelsCount)&&(identical(other.lastDuelDate, lastDuelDate) || other.lastDuelDate == lastDuelDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Profile&&(identical(other.id, id) || other.id == id)&&(identical(other.username, username) || other.username == username)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.email, email) || other.email == email)&&(identical(other.avatarUrl, avatarUrl) || other.avatarUrl == avatarUrl)&&(identical(other.arenaWins, arenaWins) || other.arenaWins == arenaWins)&&(identical(other.arenaLosses, arenaLosses) || other.arenaLosses == arenaLosses)&&(identical(other.currentStreak, currentStreak) || other.currentStreak == currentStreak)&&(identical(other.dailyDuelsCount, dailyDuelsCount) || other.dailyDuelsCount == dailyDuelsCount)&&(identical(other.lastDuelDate, lastDuelDate) || other.lastDuelDate == lastDuelDate)&&(identical(other.difficultyPreference, difficultyPreference) || other.difficultyPreference == difficultyPreference));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,username,firstName,lastName,email,avatarUrl,arenaWins,arenaLosses,currentStreak,dailyDuelsCount,lastDuelDate);
+int get hashCode => Object.hash(runtimeType,id,username,firstName,lastName,email,avatarUrl,arenaWins,arenaLosses,currentStreak,dailyDuelsCount,lastDuelDate,difficultyPreference);
 
 @override
 String toString() {
-  return 'Profile(id: $id, username: $username, firstName: $firstName, lastName: $lastName, email: $email, avatarUrl: $avatarUrl, arenaWins: $arenaWins, arenaLosses: $arenaLosses, currentStreak: $currentStreak, dailyDuelsCount: $dailyDuelsCount, lastDuelDate: $lastDuelDate)';
+  return 'Profile(id: $id, username: $username, firstName: $firstName, lastName: $lastName, email: $email, avatarUrl: $avatarUrl, arenaWins: $arenaWins, arenaLosses: $arenaLosses, currentStreak: $currentStreak, dailyDuelsCount: $dailyDuelsCount, lastDuelDate: $lastDuelDate, difficultyPreference: $difficultyPreference)';
 }
 
 
@@ -267,7 +269,7 @@ abstract mixin class _$ProfileCopyWith<$Res> implements $ProfileCopyWith<$Res> {
   factory _$ProfileCopyWith(_Profile value, $Res Function(_Profile) _then) = __$ProfileCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String username,@JsonKey(name: 'first_name') String? firstName,@JsonKey(name: 'last_name') String? lastName, String? email,@JsonKey(name: 'avatar_url') String? avatarUrl,@JsonKey(name: 'arena_wins') int? arenaWins,@JsonKey(name: 'arena_losses') int? arenaLosses,@JsonKey(name: 'current_streak') int? currentStreak,@JsonKey(name: 'daily_duels_count') int dailyDuelsCount,@JsonKey(name: 'last_duel_date') DateTime? lastDuelDate
+ String id, String username,@JsonKey(name: 'first_name') String? firstName,@JsonKey(name: 'last_name') String? lastName, String? email,@JsonKey(name: 'avatar_url') String? avatarUrl,@JsonKey(name: 'arena_wins') int? arenaWins,@JsonKey(name: 'arena_losses') int? arenaLosses,@JsonKey(name: 'current_streak') int? currentStreak,@JsonKey(name: 'daily_duels_count') int dailyDuelsCount,@JsonKey(name: 'last_duel_date') DateTime? lastDuelDate,@JsonKey(name: 'difficulty_preference') String difficultyPreference
 });
 
 
@@ -284,7 +286,7 @@ class __$ProfileCopyWithImpl<$Res>
 
 /// Create a copy of Profile
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? username = null,Object? firstName = freezed,Object? lastName = freezed,Object? email = freezed,Object? avatarUrl = freezed,Object? arenaWins = freezed,Object? arenaLosses = freezed,Object? currentStreak = freezed,Object? dailyDuelsCount = null,Object? lastDuelDate = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? username = null,Object? firstName = freezed,Object? lastName = freezed,Object? email = freezed,Object? avatarUrl = freezed,Object? arenaWins = freezed,Object? arenaLosses = freezed,Object? currentStreak = freezed,Object? dailyDuelsCount = null,Object? lastDuelDate = freezed,Object? difficultyPreference = null,}) {
   return _then(_Profile(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,username: null == username ? _self.username : username // ignore: cast_nullable_to_non_nullable
@@ -297,7 +299,8 @@ as int?,arenaLosses: freezed == arenaLosses ? _self.arenaLosses : arenaLosses //
 as int?,currentStreak: freezed == currentStreak ? _self.currentStreak : currentStreak // ignore: cast_nullable_to_non_nullable
 as int?,dailyDuelsCount: null == dailyDuelsCount ? _self.dailyDuelsCount : dailyDuelsCount // ignore: cast_nullable_to_non_nullable
 as int,lastDuelDate: freezed == lastDuelDate ? _self.lastDuelDate : lastDuelDate // ignore: cast_nullable_to_non_nullable
-as DateTime?,
+as DateTime?,difficultyPreference: null == difficultyPreference ? _self.difficultyPreference : difficultyPreference // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 

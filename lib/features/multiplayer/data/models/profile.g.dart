@@ -21,6 +21,7 @@ _Profile _$ProfileFromJson(Map<String, dynamic> json) => _Profile(
       json['last_duel_date'] == null
           ? null
           : DateTime.parse(json['last_duel_date'] as String),
+  difficultyPreference: json['difficulty_preference'] as String? ?? 'all',
 );
 
 Map<String, dynamic> _$ProfileToJson(_Profile instance) => <String, dynamic>{
@@ -35,4 +36,5 @@ Map<String, dynamic> _$ProfileToJson(_Profile instance) => <String, dynamic>{
   'current_streak': instance.currentStreak,
   'daily_duels_count': instance.dailyDuelsCount,
   'last_duel_date': instance.lastDuelDate?.toIso8601String(),
+  'difficulty_preference': instance.difficultyPreference,
 };

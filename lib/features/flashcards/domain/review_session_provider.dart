@@ -6,6 +6,7 @@ import 'package:wisdom_gre_app/features/flashcards/data/models/word_progress.dar
 import 'package:wisdom_gre_app/features/dashboard/domain/providers/exam_goal_provider.dart';
 import 'package:wisdom_gre_app/features/vocabulary/data/models/gre_word.dart';
 import 'package:wisdom_gre_app/features/subscriptions/domain/subscription_provider.dart';
+import 'package:wisdom_gre_app/core/providers/difficulty_filter_provider.dart';
 
 part 'review_session_provider.g.dart';
 
@@ -58,10 +59,15 @@ class DailyQueue extends _$DailyQueue {
     final todayStr = "${now.year}-${now.month}-${now.day}";
 
     if (queueDateStr == todayStr) {
-      final queueStr = prefs.getString(_dailyQueueKey);
-      if (queueStr != null) {
-        final List<dynamic> jsonList = jsonDecode(queueStr);
-        return jsonList.cast<String>();
+      final queueDifficulty = prefs.getString('daily_queue_difficulty') ?? 'all';
+      final currentDifficulty = ref.read(difficultyFilterControllerProvider);
+      
+      if (queueDifficulty == currentDifficulty) {
+        final queueStr = prefs.getString(_dailyQueueKey);
+        if (queueStr != null) {
+          final List<dynamic> jsonList = jsonDecode(queueStr);
+          return jsonList.cast<String>();
+        }
       }
     }
     // Otherwise, generate a new queue for today
@@ -69,13 +75,32 @@ class DailyQueue extends _$DailyQueue {
   }
 
   Future<List<String>> _generateNewQueue(String todayStr) async {
-    final allWordsQuery = await ref.watch(vocabularyProvider.future);
+    final allWordsQueryRaw = await ref.watch(vocabularyProvider.future);
     final progressQuery = await ref.watch(wordProgressRepositoryProvider.future);
-    final totalWords = allWordsQuery.length;
+    final currentDifficulty = ref.watch(difficultyFilterControllerProvider);
+    
+    // Calculate total words correctly based on the filtered list or all?
+    // Daily goal depends on total words, let's keep goal based on all words.
+    final totalWords = allWordsQueryRaw.length;
     final goal = ref.read(dailyGoalProvider(totalWords: totalWords));
 
     final todayMidnight = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    
+    // IMPORTANT: Count ALL words reviewed today across ANY difficulty to prevent free limit bypass
     int reviewedTodayCount = 0;
+    for (final prog in progressQuery.values) {
+      if (prog.lastReviewDate != null) {
+        final lrDate = DateTime(prog.lastReviewDate!.year, prog.lastReviewDate!.month, prog.lastReviewDate!.day);
+        if (lrDate.isAtSameMomentAs(todayMidnight)) {
+          reviewedTodayCount++;
+        }
+      }
+    }
+
+    // Filter available words by difficulty preference
+    final allWordsQuery = currentDifficulty == 'all'
+        ? allWordsQueryRaw
+        : allWordsQueryRaw.where((w) => w.difficulty.toLowerCase() == currentDifficulty.toLowerCase()).toList();
 
     List<GreWord> dueWords = [];
     List<GreWord> newWords = [];
@@ -88,7 +113,7 @@ class DailyQueue extends _$DailyQueue {
         if (prog.lastReviewDate != null) {
           final lrDate = DateTime(prog.lastReviewDate!.year, prog.lastReviewDate!.month, prog.lastReviewDate!.day);
           if (lrDate.isAtSameMomentAs(todayMidnight)) {
-            reviewedTodayCount++;
+            // Already reviewed today, skip adding to queue
             continue;
           }
         }
@@ -112,6 +137,7 @@ class DailyQueue extends _$DailyQueue {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_dailyQueueDateKey, todayStr);
     await prefs.setString(_dailyQueueKey, jsonEncode(queueIds));
+    await prefs.setString('daily_queue_difficulty', currentDifficulty);
 
     return queueIds;
   }

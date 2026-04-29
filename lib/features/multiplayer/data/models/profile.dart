@@ -17,6 +17,7 @@ abstract class Profile with _$Profile {
     @JsonKey(name: 'current_streak') int? currentStreak,
     @JsonKey(name: 'daily_duels_count') @Default(0) int dailyDuelsCount,
     @JsonKey(name: 'last_duel_date') DateTime? lastDuelDate,
+    @JsonKey(name: 'difficulty_preference') @Default('all') String difficultyPreference,
   }) = _Profile;
 
   factory Profile.fromJson(Map<String, dynamic> json) => _$ProfileFromJson(json);
